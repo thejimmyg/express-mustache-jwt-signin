@@ -1,0 +1,31 @@
+{
+  "name": "express-mustache-jwt-signin",
+  "version": "0.1.0",
+  "description": "A sign in example",
+  "scripts": {
+    "docker:build": "docker build . -t docker.jimmyg.org/express-mustache-jwt-signin:latest",
+    "docker:push": "docker push docker.jimmyg.org/express-mustache-jwt-signin:latest",
+    "docker:run": "docker run -e PORT=9005 -e SECRET='reallysecret' --init -p 9005:9005 docker.jimmyg.org/express-mustache-jwt-signin:latest",
+    "start": "node bin/server.js",
+    "fix": "standard --fix bin/*.js lib/*.js"
+  },
+  "author": "JimmyG",
+  "license": "MIT",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "debug": "^4.1.0",
+    "express": "^4.16.4",
+    "express-mustache-overlays": "^0.1.0",
+    "morgan": "^1.9.1",
+    "passport": "^0.4.0",
+    "passport-jwt-cookiecombo": "^1.0.5",
+    "standardjs": "^1.0.0-alpha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:thejimmyg/express-mustache-jwt-signin.git"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}

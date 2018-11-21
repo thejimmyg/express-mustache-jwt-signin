@@ -7,7 +7,7 @@
     "docker:push": "docker push docker.jimmyg.org/express-mustache-jwt-signin:latest",
     "docker:run": "docker run -e PORT=9005 -e SECRET='reallysecret' --init -p 9005:9005 docker.jimmyg.org/express-mustache-jwt-signin:latest",
     "start": "node bin/server.js",
-    "fix": "standard --fix bin/*.js lib/*.js"
+    "fix": "standard --fix index.js bin/*.js lib/*.js"
   },
   "author": "JimmyG",
   "license": "MIT",
@@ -18,8 +18,7 @@
     "express-mustache-overlays": "^0.1.0",
     "morgan": "^1.9.1",
     "passport": "^0.4.0",
-    "passport-jwt-cookiecombo": "^1.0.5",
-    "standardjs": "^1.0.0-alpha"
+    "passport-jwt-cookiecombo": "^1.0.5"
   },
   "repository": {
     "type": "git",

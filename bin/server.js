@@ -1,7 +1,8 @@
 const express = require('express')
+const debug = require('debug')('express-mustache-jwt-signin')
 const setupMustache = require('express-mustache-overlays')
 const path = require('path')
-const { withUser, signedIn, setupLogin } = require('../lib')
+const { setupLogin } = require('../lib')
 
 const port = process.env.PORT || 9005
 const secret = process.env.SECRET
@@ -16,8 +17,8 @@ const credentials = {
 
 const main = async () => {
   const app = express()
+  const { withUser, signedIn } = setupLogin(app, secret, credentials)
 
-  setupLogin(app, secret, credentials, '/dashboard')
   await setupMustache(app, templateDefaults, mustacheDirs)
 
   // Make req.user available to everything
@@ -41,9 +42,7 @@ const main = async () => {
 
   // Error handler has to be last
   app.use(function (err, req, res, next) {
-    if ((process.env.DEBUG || 'false').toLowerCase() === 'true') {
-      console.log('Error:', err)
-    }
+    debug('Error:', err)
     res.status(500).send('Something broke!')
   })
 

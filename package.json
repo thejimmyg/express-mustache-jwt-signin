@@ -1,6 +1,6 @@
 {
   "name": "express-mustache-jwt-signin",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A sign in example",
   "scripts": {
     "docker:build": "docker build . -t docker.jimmyg.org/express-mustache-jwt-signin:latest",
@@ -15,7 +15,7 @@
     "cookie-parser": "^1.4.3",
     "debug": "^4.1.0",
     "express": "^4.16.4",
-    "express-mustache-overlays": "^0.1.0",
+    "express-mustache-overlays": "^0.1.1",
     "jsonwebtoken": "^8.4.0"
   },
   "repository": {

@@ -19,7 +19,10 @@
           <div class="right col-md-6">
             {{#user}}
             <p>
-              {{username}}
+              {{#admin}}
+              Admin
+              {{/admin}}
+              <strong>{{username}}</strong>
               <a href="/signout">Signout</a>
             </p>
             {{/user}}

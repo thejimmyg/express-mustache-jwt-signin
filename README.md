@@ -4,7 +4,7 @@
 
 ```
 npm install
-PORT=9005 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin node bin/server.js
+PORT=9005 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin npm start
 ```
 
 Visit http://localhost:9005 and sign in with username `hello` and password `world`.
@@ -33,6 +33,17 @@ npm run docker:run
 ```
 
 ### Test
+
+Login:
+
+```
+# Success
+curl -X POST -v --data "username=hello&password=world" http://localhost:9005/signin
+# Failure
+curl -X POST -v --data "username=hello&password=INVALID" http://localhost:9005/signin
+```
+
+Accessing via cookie or Authorization header:
 
 ```
 # Using SECRET='reallysecret' as above
@@ -64,6 +75,10 @@ Found. Redirecting to /signinJamess-MacBook:express-mustache-jwt-signin james$
 
 
 ## Changelog
+
+### 0.2.1
+
+* `credentials` can now be a function which checks a username and password and returns claims, or a data structure like this: `{'hello': {password: 'world', claims: {"admin": true}}}`
 
 ### 0.2.0
 

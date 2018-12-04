@@ -11,8 +11,17 @@ if (!secret || secret.length < 8) {
 }
 const templateDefaults = { title: 'Title' }
 const mustacheDirs = path.join(__dirname, '..', 'views')
-const credentials = {
-  'hello': 'world'
+
+// const credentials = {
+//   'hello': { password: 'world', claims: {'admin': true} }
+// }
+// or
+
+async function credentials (username, password) {
+  if (username === 'hello' && password === 'world') {
+    return { 'admin': true }
+  }
+  throw new Error('Invalid credentials')
 }
 
 const main = async () => {
@@ -25,7 +34,7 @@ const main = async () => {
   app.use(withUser)
 
   app.get('/', (req, res) => {
-    res.render('main', { user: req.user, content: '<h1>Home</h1><p>Hello!</p>' })
+    res.render('main', { user: req.user, title: 'Home', content: '<h1>Home</h1><p>Hello!</p>' })
   })
 
   app.get('/dashboard', signedIn, (req, res) => {

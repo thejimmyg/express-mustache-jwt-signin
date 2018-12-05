@@ -60,14 +60,12 @@ curl -H "Authorization: Bearer $INVALID_JWT" http://localhost:9005/user/dashboar
 curl --cookie "jwt=$INVALID_JWT;" http://localhost:9005/user/dashboard
 ```
 
-At the moment only JWTs with HS256 will be allowed (since this is the default
-of that `algorithm` setting of the `jsonwebtoken` package this package depends
-on). You can verify this with a valid token, but with a different algorithm
-like this:
+At the moment only JWTs with HS256 will be allowed. You can verify this with a
+token that uses a different algorithm like this one which uses `HS512`:
 
 ```
-export VALID_JWT="eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoiaGVsbG8iLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNTQzNTg4MjE3fQ.eym-MugNjwzmD114trr6Mss5KpenDB42MONCDqmaBJyDBisQHCehqoMyPqC80uFtIkwo3uP8N_5Vn9lbYPLB6g"
-curl --cookie "jwt=$INVALID_JWT;" http://localhost:9005/user/dashboard
+export ALG_JWT="eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoiaGVsbG8iLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNTQzNTg4MjE3fQ.eym-MugNjwzmD114trr6Mss5KpenDB42MONCDqmaBJyDBisQHCehqoMyPqC80uFtIkwo3uP8N_5Vn9lbYPLB6g"
+curl --cookie "jwt=$ALG_JWT;" http://localhost:9005/user/dashboard
 ```
 
 You'll see:
@@ -84,6 +82,8 @@ Found. Redirecting to /user/signin
 * `credentials` can now be a function which checks a username and password and returns claims, or a data structure like this: `{'hello': {password: 'world', claims: {"admin": true}}}`
 * Use `/user/signin`, `/user/dashboard` and `/user/signout` as the URLs so that the whole app can be proxied too to handle auth
 * Use the actual URLs in the templates
+* Added a `setupMiddleware` function so that you can use the `signedIn` and `withUser` middleware without setting up routes on an express app at the same time
+* Explicit use of HS256 algorithm
 
 ### 0.2.0
 

@@ -9,7 +9,6 @@ const secret = process.env.SECRET
 if (!secret || secret.length < 8) {
   throw new Error('No SECRET environment variable set, or the SECRET is too short. Need 8 characters')
 }
-const templateDefaults = { title: 'Title' }
 const mustacheDirs = path.join(__dirname, '..', 'views')
 
 // const credentials = {
@@ -28,16 +27,21 @@ const main = async () => {
   const app = express()
   const { withUser, signedIn } = setupLogin(app, secret, credentials)
 
+  const templateDefaults = { title: 'Title', signOutURL: '/user/signout', signInURL: '/user/signin' }
   await setupMustache(app, templateDefaults, mustacheDirs)
 
   // Make req.user available to everything
   app.use(withUser)
 
   app.get('/', (req, res) => {
+    res.redirect('/user/')
+  })
+
+  app.get('/user/', (req, res) => {
     res.render('main', { user: req.user, title: 'Home', content: '<h1>Home</h1><p>Hello!</p>' })
   })
 
-  app.get('/dashboard', signedIn, (req, res) => {
+  app.get('/user/dashboard', signedIn, (req, res) => {
     res.render('main', { title: 'Dashboard', user: req.user, content: '<h1>Dashboard</h1><p>Not much to see here.</p>' })
   })
 

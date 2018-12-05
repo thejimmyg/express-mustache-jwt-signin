@@ -5,7 +5,7 @@
       <h1>Sign In</h1>
       {{>signin_top}}
       {{#signInError}}
-        <p class="error">{{signInError}}</p>
+      <div class="alert alert-danger">{{signInError}}</div>
       {{/signInError}}
       <form method="POST" action="{{action}}">
         <div class="form-group">

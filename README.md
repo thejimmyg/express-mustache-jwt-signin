@@ -20,6 +20,98 @@ header like this:
 Authorization: Bearer <JWT goes here>
 ```
 
+## Configuration
+
+This module exports two functions, `setupLogin` and `setupMiddleware`. You can
+import them like this:
+
+```
+const { setupLogin, setupMiddleware } = require('express-mustache-jwt-signin')
+```
+
+`setupMiddleware` is used when you want a different Express app to be able to
+use the credentials produced by this package. `setupLogin` is for setting up
+the middleware and a set of routes, templates and handlers that allows a user
+to sign in and out with a web interface. `setupLogin` calls `setupMiddelware`
+internally as part of its setup.
+
+**`setupMiddleware(secret, [options])`**
+
+Returns:
+
+* `withUser` - Express middleware for adding `req.user` to the request based on the contents of the JWT
+* `signedIn` - Express middleware for ensuring `req.user` is present, and
+  redirecting to a sign in page if not for the user to sign in
+
+Requires:
+
+* `secret` - A secret string of at least 8 characters for signing and verifying JWTs
+
+Options:
+
+An object with the following optional keys:
+
+* `jwtCookieName` - The name to use for the cookie that will contain the JWT, e.g. `jwt`
+* `signInURL` - The URL path you want the sign in page to appear at, e.g. `'/user/signin'`
+* `extractTokenFromRequest` - A function that is passed the request `req` and
+  the cookie name `jwtCookieName` and is expected to reurn the JWT as a string.
+  The default implementation will obtain a JWT from a cookie first, or the
+  `Authorization` header otherwise. If using the `Authorization` header, it
+  will accept the JWT itself as the value, or the JWT prefixed with `Bearer `.
+
+**`setupLogin(app, secret, credentials, [options])`** 
+
+Sets up the `withUser` middleware to populate `req.user` as well as routes for
+signing a user in and out.
+
+Returns:
+
+The same `withUser` and `signedIn` middleware that `setupMiddleware` returns,
+as described above. Although `withUser` isn't really needed because it is
+already applied.
+
+Requires:
+
+* `app` - The Express app that should have the middleware and routes applied to it
+* `secret` - A secret string of at least 8 characters for signing and verifying JWTs
+* `credentials` - Either a credential checking function (see below) or an
+  object of credentials of the form `{username: {password, claims}}` where the
+  `claims` can be a set of JSON-serialisable key-value pairs to use as JWT
+  claims e.g. `{admin: true}`. The `claims` should not include `username` or
+  `iat` keys.
+
+If you choose to pass a function as the `credentials` argument, it should take
+the `username` and `password` submitted by the form and either return the
+claims to be added to the JWT (JSON-serialisable key value pairs excluding
+`'username'` and `'iat'` keys) or throw an Error.
+
+Here's a very simple example that only allows the username `hello` and password `world`:
+
+```
+async function credentials (username, password) {
+  if (username === 'hello' && password === 'world') {
+    return { 'admin': true }
+  }
+  throw new Error('Invalid credentials')
+}
+```
+
+Internally the function is called with `await` so if you define `credentials`
+as an async function you can use `async` and `await` in your definition.
+
+Options:
+
+* `signInURL` - same as in `setupMiddleware()` options described above
+* `jwtCookieName` - same as in `setupMiddleware()` options described above
+* `extractTokenFromRequest` - same as in `setupMiddleware()` options described above
+* `dashboardURL` - e.g. `'/user/dashboard'`
+* `signOutURL` - e.g. `'/user/signout'`
+* `signedOutTemplate` - e.g. `'signedOut'`
+* `signInTemplate` - e.g. `'signIn'`
+* `signedOutTitle` - e.g. `'Signed Out'`
+* `signInTitle` - e.g. `'Sign In'`
+
+
 ## Development
 
 ```
@@ -76,6 +168,12 @@ Found. Redirecting to /user/signin
 
 
 ## Changelog
+
+### 0.2.2
+
+* Modified naming convention for templates and variables
+* Documented the options
+* Updated the templates to use FlexBox
 
 ### 0.2.1
 

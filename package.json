@@ -1,6 +1,6 @@
 {
   "name": "express-mustache-jwt-signin",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A sign in example",
   "scripts": {
     "docker:build": "docker build . -t docker.jimmyg.org/express-mustache-jwt-signin:latest",

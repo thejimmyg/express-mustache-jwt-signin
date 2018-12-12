@@ -3,8 +3,8 @@
   "version": "0.2.2",
   "description": "A sign in example",
   "scripts": {
-    "docker:build": "docker build . -t docker.jimmyg.org/express-mustache-jwt-signin:latest",
-    "docker:push": "docker push docker.jimmyg.org/express-mustache-jwt-signin:latest",
+    "docker:build": "docker build . -t thejimmyg/express-mustache-jwt-signin:0.2.2",
+    "docker:push": "docker push thejimmyg/express-mustache-jwt-signin:0.2.2",
     "docker:run": "docker run -e PORT=9005 -e SECRET='reallysecret' --init -p 9005:9005 docker.jimmyg.org/express-mustache-jwt-signin:latest",
     "start": "node bin/server.js",
     "fix": "standard --fix index.js bin/*.js lib/*.js"

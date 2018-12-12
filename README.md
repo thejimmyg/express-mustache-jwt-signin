@@ -43,6 +43,15 @@ Returns:
 * `signedIn` - Express middleware for ensuring `req.user` is present, and
   redirecting to a sign in page if not for the user to sign in
 
+Note, `withUser` requires the `cookie-parser` middleware set up first:
+
+```
+const cookieParser = require('cookie-parser')
+
+const app = express()
+app.use(cookieParser())
+```
+
 Requires:
 
 * `secret` - A secret string of at least 8 characters for signing and verifying JWTs
@@ -69,6 +78,8 @@ Returns:
 The same `withUser` and `signedIn` middleware that `setupMiddleware` returns,
 as described above. Although `withUser` isn't really needed because it is
 already applied.
+
+`setupLogin()` sets up the `cookie-parser` middleware for you.
 
 Requires:
 

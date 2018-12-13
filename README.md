@@ -7,7 +7,7 @@ outside the development team yet.**
 
 ```
 npm install
-HTTPS_ONLY=false PORT=9005 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin npm start
+SCRIPT_NAME=/ HTTPS_ONLY=false PORT=9005 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin npm start
 ```
 
 Visit http://localhost:9005 and sign in with username `hello` and password `world`.
@@ -42,6 +42,7 @@ Returns:
 * `withUser` - Express middleware for adding `req.user` to the request based on the contents of the JWT
 * `signedIn` - Express middleware for ensuring `req.user` is present, and
   redirecting to a sign in page if not for the user to sign in
+* `hasClaims` - Express middleware for checking the claims associated with a custom function
 
 Note, `withUser` requires the `cookie-parser` middleware set up first:
 
@@ -184,6 +185,7 @@ Found. Redirecting to /user/signin
 ### 0.2.3
 
 * Created `httpsOnly` option for secure cookies. It defaults to `true` and is used as the `secure` parameter to `res.cookie`. The value no longer depends on the value of `NODE_ENV`.
+* Support `SCRIPT_NAME` environment variable which defaults to `/` but is passed into the templates as `scriptName` in case paths need to be relative to this URL.
 
 ### 0.2.2
 

@@ -4,6 +4,7 @@ const setupMustache = require('express-mustache-overlays')
 const path = require('path')
 const { setupLogin } = require('../lib')
 
+const scriptName = process.env.SCRIPT_NAME || '/'
 const port = process.env.PORT || 9005
 let httpsOnly = (process.env.HTTPS_ONLY || 'true').toLowerCase()
 if (httpsOnly === 'false') {
@@ -32,9 +33,11 @@ async function credentials (username, password) {
 
 const main = async () => {
   const app = express()
-  const { withUser, signedIn } = setupLogin(app, secret, credentials, {httpsOnly})
+  const { withUser, signedIn, hasClaims } = setupLogin(app, secret, credentials, { httpsOnly })
 
-  const templateDefaults = { title: 'Title', signOutURL: '/user/signout', signInURL: '/user/signin' }
+  const adminURL = '/user/admin'
+
+  const templateDefaults = { title: 'Title', scriptName, adminURL, signOutURL: '/user/signout', signInURL: '/user/signin' }
   await setupMustache(app, templateDefaults, mustacheDirs)
 
   // Make req.user available to everything
@@ -50,6 +53,10 @@ const main = async () => {
 
   app.get('/user/dashboard', signedIn, (req, res) => {
     res.render('main', { title: 'Dashboard', user: req.user, content: '<h1>Dashboard</h1><p>Not much to see here.</p>' })
+  })
+
+  app.get('/user/admin', hasClaims(claims => claims.admin), (req, res) => {
+    res.render('main', { title: 'Admin', user: req.user, content: '<h1>Admin</h1><p>Only those with the <tt>admin</tt> claim set to <tt>true</tt> can see this.</p>' })
   })
 
   app.use(express.static(path.join(__dirname, '..', 'public')))

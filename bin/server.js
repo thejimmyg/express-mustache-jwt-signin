@@ -5,6 +5,13 @@ const path = require('path')
 const { setupLogin } = require('../lib')
 
 const port = process.env.PORT || 9005
+let httpsOnly = (process.env.HTTPS_ONLY || 'true').toLowerCase()
+if (httpsOnly === 'false') {
+  httpsOnly = false
+} else {
+  httpsOnly = true
+  debug('Only setting cookies for HTTPS access. If you can\'t log in, make sure you are accessing the server over HTTPS.')
+}
 const secret = process.env.SECRET
 if (!secret || secret.length < 8) {
   throw new Error('No SECRET environment variable set, or the SECRET is too short. Need 8 characters')
@@ -25,7 +32,7 @@ async function credentials (username, password) {
 
 const main = async () => {
   const app = express()
-  const { withUser, signedIn } = setupLogin(app, secret, credentials)
+  const { withUser, signedIn } = setupLogin(app, secret, credentials, {httpsOnly})
 
   const templateDefaults = { title: 'Title', signOutURL: '/user/signout', signInURL: '/user/signin' }
   await setupMustache(app, templateDefaults, mustacheDirs)

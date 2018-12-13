@@ -7,7 +7,7 @@ outside the development team yet.**
 
 ```
 npm install
-PORT=9005 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin npm start
+HTTPS_ONLY=false PORT=9005 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin npm start
 ```
 
 Visit http://localhost:9005 and sign in with username `hello` and password `world`.
@@ -115,6 +115,7 @@ Options:
 * `signInURL` - same as in `setupMiddleware()` options described above
 * `jwtCookieName` - same as in `setupMiddleware()` options described above
 * `extractTokenFromRequest` - same as in `setupMiddleware()` options described above
+* `httpsOnly` - defaults to `true` and means the cookie is not sent by the browser over unsecure HTTP. For local testing it is useful to set this to `false`.
 * `dashboardURL` - e.g. `'/user/dashboard'`
 * `signOutURL` - e.g. `'/user/signout'`
 * `signedOutTemplate` - e.g. `'signedOut'`
@@ -179,6 +180,10 @@ Found. Redirecting to /user/signin
 
 
 ## Changelog
+
+### 0.2.3
+
+* Created `httpsOnly` option for secure cookies. It defaults to `true` and is used as the `secure` parameter to `res.cookie`. The value no longer depends on the value of `NODE_ENV`.
 
 ### 0.2.2
 

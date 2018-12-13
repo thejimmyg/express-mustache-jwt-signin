@@ -3,6 +3,7 @@ const debug = require('debug')('express-mustache-jwt-signin')
 const setupMustache = require('express-mustache-overlays')
 const path = require('path')
 const { setupLogin } = require('../lib')
+const { createCredentialsFromWatchedUsersYaml } = require('../lib/loadUsers')
 
 const scriptName = process.env.SCRIPT_NAME || '/'
 const port = process.env.PORT || 9005
@@ -22,18 +23,25 @@ const mustacheDirs = path.join(__dirname, '..', 'views')
 // const credentials = {
 //   'hello': { password: 'world', claims: {'admin': true} }
 // }
+//
 // or
-
-async function credentials (username, password) {
-  if (username === 'hello' && password === 'world') {
-    return { 'admin': true }
-  }
-  throw new Error('Invalid credentials')
-}
+//
+// async function credentials (username, password) {
+//   if (username === 'hello' && password === 'world') {
+//     return { 'admin': true }
+//   }
+//   throw new Error('Invalid credentials')
+// }
+//
+// or
+//
+// Use the createCredentialsFromWatchedUsersYaml to specify users in a yaml file as we do here.
 
 const main = async () => {
+  const userData = await createCredentialsFromWatchedUsersYaml(path.join(__dirname, '..', 'yaml', 'users.yml'))
+
   const app = express()
-  const { withUser, signedIn, hasClaims } = setupLogin(app, secret, credentials, { httpsOnly })
+  const { withUser, signedIn, hasClaims } = setupLogin(app, secret, userData.credentials, { httpsOnly })
 
   const adminURL = '/user/admin'
 

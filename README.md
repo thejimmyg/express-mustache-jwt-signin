@@ -3,6 +3,8 @@
 **CAUTION: Under active development, not suitable for production use for people
 outside the development team yet.**
 
+**CAUTION: Plain text only passwords for now.**
+
 ## Example
 
 ```
@@ -11,6 +13,12 @@ SCRIPT_NAME=/ HTTPS_ONLY=false PORT=9005 SECRET='reallysecret' DEBUG=express-mus
 ```
 
 Visit http://localhost:9005 and sign in with username `hello` and password `world`.
+
+User information in this example is loaded from `yaml/users.yml` via the
+`express-mustache-jwt-signin/lib/loadUsers` module.
+
+Notice that `Admin` appears in the top right if the `admin` claim is set to
+`true` in the `yaml/users.yml` file when you sign in.
 
 You should be able to make requests to routes restricted with `signedIn`
 middleware as long as you have the cookie, or use the JWT in an `Authorization
@@ -182,10 +190,11 @@ Found. Redirecting to /user/signin
 
 ## Changelog
 
-### 0.2.3
+### 0.2.3 2018-12-13
 
 * Created `httpsOnly` option for secure cookies. It defaults to `true` and is used as the `secure` parameter to `res.cookie`. The value no longer depends on the value of `NODE_ENV`.
 * Support `SCRIPT_NAME` environment variable which defaults to `/` but is passed into the templates as `scriptName` in case paths need to be relative to this URL.
+* Created a system for loading user data and claims from `users.yml` data and use it in the example. Have the data automatically reload when the file is changed (although this doesn't take effect until the user signs in and out again).
 
 ### 0.2.2
 

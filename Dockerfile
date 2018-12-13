@@ -13,8 +13,9 @@ COPY --from=builder /app /app
 COPY bin/ /app/bin/
 COPY views/ /app/views/
 COPY lib/ /app/lib/
-COPY assets/ /app/assets/
 COPY public/ /app/public/
+RUN mkdir /app/yaml/
+RUN touch /app/yaml/users.yml
 WORKDIR /app
 EXPOSE 9005
 ENV NODE_PATH=/app/node_modules

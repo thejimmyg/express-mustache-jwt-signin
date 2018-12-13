@@ -1,0 +1,5 @@
+hello:
+  password: world
+  email: hello@example.com
+  claims:
+    admin: false

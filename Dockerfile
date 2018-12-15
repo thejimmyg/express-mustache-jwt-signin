@@ -14,8 +14,8 @@ COPY bin/ /app/bin/
 COPY views/ /app/views/
 COPY lib/ /app/lib/
 COPY public/ /app/public/
-RUN mkdir /app/yaml/
-RUN touch /app/yaml/users.yml
+# Note that when running from Docker, we don't use the development yaml/users.yml
+# you are expected to mount your own `yaml` volume containing your `users.yml` into `/app/yaml`.
 WORKDIR /app
 EXPOSE 9005
 ENV NODE_PATH=/app/node_modules

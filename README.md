@@ -9,7 +9,7 @@ outside the development team yet.**
 
 ```
 npm install
-SCRIPT_NAME=/ HTTPS_ONLY=false PORT=9005 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin npm start
+USERS_YML=yaml/users.yml MUSTACHE_DIRS="" SCRIPT_NAME="" HTTPS_ONLY=false PORT=9005 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin,express-mustache-overlays npm start
 ```
 
 Visit http://localhost:9005 and sign in with username `hello` and password `world`.
@@ -70,21 +70,23 @@ Options:
 An object with the following optional keys:
 
 * `jwtCookieName` - The name to use for the cookie that will contain the JWT, e.g. `jwt`
-* `signInURL` - The URL path you want the sign in page to appear at, e.g. `'/user/signin'`
+* `signInURL` - The URL path you want the sign in page to appear at, e.g. `'/signin'`
 * `extractTokenFromRequest` - A function that is passed the request `req` and
   the cookie name `jwtCookieName` and is expected to reurn the JWT as a string.
   The default implementation will obtain a JWT from a cookie first, or the
   `Authorization` header otherwise. If using the `Authorization` header, it
   will accept the JWT itself as the value, or the JWT prefixed with `Bearer `.
+* `forbiddenTemplate` - the name of the template to render by `hasClaims` if the check fails
+* `forbiddenTitle` - the title to give the page rendered by `hasClaims` if the check fails
 
-**`setupLogin(app, secret, credentials, [options])`** 
+**`setupLogin(app, secret, credentials, [options])`**
 
 Sets up the `withUser` middleware to populate `req.user` as well as routes for
 signing a user in and out.
 
 Returns:
 
-The same `withUser` and `signedIn` middleware that `setupMiddleware` returns,
+The same `withUser`, `signedIn` and `hasClaims` middleware that `setupMiddleware` returns,
 as described above. Although `withUser` isn't really needed because it is
 already applied.
 
@@ -124,9 +126,11 @@ Options:
 * `signInURL` - same as in `setupMiddleware()` options described above
 * `jwtCookieName` - same as in `setupMiddleware()` options described above
 * `extractTokenFromRequest` - same as in `setupMiddleware()` options described above
+* `forbiddenTemplate` - same as in `setupMiddleware()` options described above
+* `forbiddenTitle` - same as in `setupMiddleware()` options described above
 * `httpsOnly` - defaults to `true` and means the cookie is not sent by the browser over unsecure HTTP. For local testing it is useful to set this to `false`.
-* `dashboardURL` - e.g. `'/user/dashboard'`
-* `signOutURL` - e.g. `'/user/signout'`
+* `dashboardURL` - e.g. `'/dashboard'`
+* `signOutURL` - e.g. `'/signout'`
 * `signedOutTemplate` - e.g. `'signedOut'`
 * `signInTemplate` - e.g. `'signIn'`
 * `signedOutTitle` - e.g. `'Signed Out'`
@@ -147,6 +151,10 @@ docker login <REGISTRY_URL>
 npm run docker:push
 npm run docker:run
 ```
+
+**NOTE: When running from Docker, we don't use the development yaml/users.yml
+you are expected to mount your own `yaml` volumne containing your `users.yml`
+into `/app/yaml`.**
 
 ### Test
 
@@ -189,6 +197,16 @@ Found. Redirecting to /user/signin
 
 
 ## Changelog
+
+### 0.2.4 2018-12-15
+
+* Made mustacheDirs an array for correct reloading, and allow preferred overlays to be specified as `MUSTACHE_DIRS=viewsDir1:viewsDir2:viewsDir3` etc. The defaults in `views` will still be used last if a particular template or partial can't be found in the specified directories.
+* Added a 403 page instead of a redirect to sign in when a page is forbidden
+* Big refactor of the code to make Let's Encrypt fetching disabled by default, and enabled with the `--lets-encrypt` flag
+* Swapped `commander` npm package for `dashdash`
+* Home page removed from example, redirects to `dashboardURL` directly, and `dashboardURL` part of the `templateDefaults`
+* Changed the `users.yml` file reloading to be throttled, and also reload on delete and overwrite, having empty user data if there is no file.
+* Ability to specify the `users.yml` file path with `USERS_YML`
 
 ### 0.2.3 2018-12-13
 

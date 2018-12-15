@@ -1,11 +1,12 @@
 const express = require('express')
+const fs = require('fs')
 const debug = require('debug')('express-mustache-jwt-signin')
 const setupMustache = require('express-mustache-overlays')
 const path = require('path')
 const { setupLogin } = require('../lib')
 const { createCredentialsFromWatchedUsersYaml } = require('../lib/loadUsers')
 
-const scriptName = process.env.SCRIPT_NAME || '/'
+const scriptName = process.env.SCRIPT_NAME || ''
 const port = process.env.PORT || 9005
 let httpsOnly = (process.env.HTTPS_ONLY || 'true').toLowerCase()
 if (httpsOnly === 'false') {
@@ -14,11 +15,17 @@ if (httpsOnly === 'false') {
   httpsOnly = true
   debug('Only setting cookies for HTTPS access. If you can\'t log in, make sure you are accessing the server over HTTPS.')
 }
+const usersYml = process.env.USERS_YML || path.join(__dirname, '..', 'yaml', 'users.yml')
+const stat = fs.statSync(usersYml)
+if (!(stat && stat.isFile())) {
+  throw new Error(`No such users file '${usersYml}'. Please check USERS_YML.`)
+}
 const secret = process.env.SECRET
 if (!secret || secret.length < 8) {
   throw new Error('No SECRET environment variable set, or the SECRET is too short. Need 8 characters')
 }
-const mustacheDirs = path.join(__dirname, '..', 'views')
+const mustacheDirs = process.env.MUSTACHE_DIRS ? process.env.MUSTACHE_DIRS.split(':') : []
+mustacheDirs.push(path.join(__dirname, '..', 'views'))
 
 // const credentials = {
 //   'hello': { password: 'world', claims: {'admin': true} }
@@ -38,32 +45,29 @@ const mustacheDirs = path.join(__dirname, '..', 'views')
 // Use the createCredentialsFromWatchedUsersYaml to specify users in a yaml file as we do here.
 
 const main = async () => {
-  const userData = await createCredentialsFromWatchedUsersYaml(path.join(__dirname, '..', 'yaml', 'users.yml'))
+  const userData = await createCredentialsFromWatchedUsersYaml(usersYml)
 
   const app = express()
   const { withUser, signedIn, hasClaims } = setupLogin(app, secret, userData.credentials, { httpsOnly })
 
-  const adminURL = '/user/admin'
+  const adminURL = scriptName + '/admin'
+  const dashboardURL = scriptName + '/dashboard'
 
-  const templateDefaults = { title: 'Title', scriptName, adminURL, signOutURL: '/user/signout', signInURL: '/user/signin' }
+  const templateDefaults = { title: 'Title', scriptName, dashboardURL, adminURL, signOutURL: scriptName + '/signout', signInURL: scriptName + '/signin' }
   await setupMustache(app, templateDefaults, mustacheDirs)
 
   // Make req.user available to everything
   app.use(withUser)
 
-  app.get('/', (req, res) => {
-    res.redirect('/user/')
+  app.get(scriptName + '/', (req, res) => {
+    res.redirect(dashboardURL)
   })
 
-  app.get('/user/', (req, res) => {
-    res.render('main', { user: req.user, title: 'Home', content: '<h1>Home</h1><p>Hello!</p>' })
-  })
-
-  app.get('/user/dashboard', signedIn, (req, res) => {
+  app.get(scriptName + '/dashboard', signedIn, (req, res) => {
     res.render('main', { title: 'Dashboard', user: req.user, content: '<h1>Dashboard</h1><p>Not much to see here.</p>' })
   })
 
-  app.get('/user/admin', hasClaims(claims => claims.admin), (req, res) => {
+  app.get(scriptName + '/admin', hasClaims(claims => claims.admin), (req, res) => {
     res.render('main', { title: 'Admin', user: req.user, content: '<h1>Admin</h1><p>Only those with the <tt>admin</tt> claim set to <tt>true</tt> can see this.</p>' })
   })
 

@@ -7,6 +7,9 @@ const { setupLogin } = require('../lib')
 const { createCredentialsFromWatchedUsersYaml } = require('../lib/loadUsers')
 
 const scriptName = process.env.SCRIPT_NAME || ''
+if (scriptName.endsWith('/')){
+  throw new Error('SCRIPT_NAME should not end with /.')
+}
 const port = process.env.PORT || 9005
 let httpsOnly = (process.env.HTTPS_ONLY || 'true').toLowerCase()
 if (httpsOnly === 'false') {

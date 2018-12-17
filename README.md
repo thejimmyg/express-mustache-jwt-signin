@@ -12,6 +12,14 @@ npm install
 USERS_YML=yaml/users.yml MUSTACHE_DIRS="" SCRIPT_NAME="" HTTPS_ONLY=false PORT=9005 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin,express-mustache-overlays npm start
 ```
 
+You can also set these defaults:
+
+* `DASHBOARD_URL` - where the sign in should redirect to
+* `SIGN_IN_URL`
+* `COOKIE_NAME`
+* `FORBIDDEN_TEMPLATE`
+* `FORBIDDEN_TITLE`
+
 Visit http://localhost:9005 and sign in with username `hello` and password `world`.
 
 User information in this example is loaded from `yaml/users.yml` via the
@@ -27,6 +35,17 @@ header like this:
 ```
 Authorization: Bearer <JWT goes here>
 ```
+
+You can access user data by keeping the a reference to the varibale returned by `createCredentialsFromWatchedUsersYaml()`. Its `.users` attribute will be updated as the file changes:
+
+```
+const userData = await createCredentialsFromWatchedUsersYaml(process.env.USERS_YML)
+console.log(userData.users)
+```
+
+Then use `userData.credentials` as your credentials function. (There is also a `userData.passwords` which you should not use.)
+
+**Note: Usernames are treated as lower-case everywhere. So you should use a lower-case email when looking up data in `userData.users`**
 
 ## Configuration
 
@@ -197,6 +216,11 @@ Found. Redirecting to /user/signin
 
 
 ## Changelog
+
+### 0.2.5 2018-12-17
+
+* Make `DASHBOARD_URL` configurable.
+* Added missing `js-yaml` dependency.
 
 ### 0.2.4 2018-12-15
 

@@ -1,13 +1,13 @@
 {
   "name": "express-mustache-jwt-signin",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "A sign in example",
   "scripts": {
-    "docker:build": "docker build . -t thejimmyg/express-mustache-jwt-signin:0.2.5",
-    "docker:push": "docker push thejimmyg/express-mustache-jwt-signin:0.2.5",
+    "docker:build": "docker build . -t thejimmyg/express-mustache-jwt-signin:0.2.6",
+    "docker:push": "docker push thejimmyg/express-mustache-jwt-signin:0.2.6",
     "docker:build:test": "docker build . -t thejimmyg/express-mustache-jwt-signin:test",
     "docker:push:test": "docker push thejimmyg/express-mustache-jwt-signin:test",
-    "docker:run": "docker run -e PORT=9005 -e SECRET='reallysecret' --init -p 9005:9005 -v \"`pwd`/yaml:/app/yaml\" thejimmyg/express-mustache-jwt-signin:0.2.5",
+    "docker:run": "docker run -e PORT=9005 -e SECRET='reallysecret' --init -p 9005:9005 -v \"`pwd`/yaml:/app/yaml\" thejimmyg/express-mustache-jwt-signin:0.2.6",
     "start": "node bin/server.js",
     "fix": "standard --fix index.js bin/*.js lib/*.js"
   },
@@ -16,6 +16,7 @@
   "dependencies": {
     "chokidar": "^2.0.4",
     "cookie-parser": "^1.4.3",
+    "credential": "^2.0.0",
     "debug": "^4.1.0",
     "express": "^4.16.4",
     "express-mustache-overlays": "^0.1.3",

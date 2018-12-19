@@ -5,6 +5,7 @@ const setupMustache = require('express-mustache-overlays')
 const path = require('path')
 const { setupLogin } = require('../lib')
 const { createCredentialsFromWatchedUsersYaml } = require('../lib/loadUsers')
+const { hashPassword } = require('../lib/hash')
 
 const scriptName = process.env.SCRIPT_NAME || ''
 if (scriptName.endsWith('/')){
@@ -72,6 +73,30 @@ const main = async () => {
 
   app.get(scriptName + '/admin', hasClaims(claims => claims.admin), (req, res) => {
     res.render('main', { title: 'Admin', user: req.user, content: '<h1>Admin</h1><p>Only those with the <tt>admin</tt> claim set to <tt>true</tt> can see this.</p>' })
+  })
+
+  app.all(scriptName + '/hash', hasClaims(claims => claims.admin), async (req, res) => {
+    let hashError = ''
+    const action = req.path
+    let password = ''
+    let confirmPassword = ''
+    if (req.method === 'POST') {
+      password = req.body.password
+      confirmPassword = req.body.confirm_password
+      let error = false
+      if (!password.length) {
+        hashError = 'Please enter a password'
+        error = true
+      } else if (password !== confirmPassword) {
+        hashError = 'Passwords must match'
+        error = true
+      } else {
+        const hashed = await hashPassword(password)
+        res.send(hashed)
+        return
+      }
+    }
+    res.render('hash', { title: 'Hash', user: req.user, hashError, action })
   })
 
   app.use(express.static(path.join(__dirname, '..', 'public')))

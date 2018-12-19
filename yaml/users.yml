@@ -1,5 +1,5 @@
 hello:
-  password: world
+  password: eyJoYXNoIjoiQnNKVlZ3c1hNaC9zcDJzWk1WWlBiL1d5K3EyeHJUZVY5VS82RmdSZDUrRWZCNTY3aU9hWmY4T05xQWcyR2dBQ0szb0lDcC9WbFNLQUdWSVRLbnVjaGlVeSIsInNhbHQiOiIyeWEyTnBVYXk4L0JMZ2Nkb3VZZXlsS3BvT04rSVplZ3A2aHlWRUxQWXM4Mk5UTUdHVHFuQlZnOHM3QWoxS0tLZ2lqb2Z3NlB0WFA4eTJXdnhIWkxTWktGIiwia2V5TGVuZ3RoIjo2NiwiaGFzaE1ldGhvZCI6InBia2RmMiIsIml0ZXJhdGlvbnMiOjcxNTA5fQ==
   email: hello@example.com
   claims:
-    admin: false
+    admin: true

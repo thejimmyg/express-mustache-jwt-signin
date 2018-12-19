@@ -3,13 +3,30 @@
 **CAUTION: Under active development, not suitable for production use for people
 outside the development team yet.**
 
-**CAUTION: Plain text only passwords for now.**
+**CAUTION: Plain text only passwords are still possible.**
+
+## Password format in `yaml/users.yml`
+
+The `password` field can contain plain text or hashed passwords. If the password is more than 64 characters, it is treated as a hashed password.
+
+You need the `admin: true` claim in order to access `/hash` for generating a password hashes to go in `yaml/users.yml` and `/admin` to test whether you have the admin claim or not.
+
+```
+hello:
+  password: eyJoYXNoIjoiQnNKVlZ3c1hNaC9zcDJzWk1WWlBiL1d5K3EyeHJUZVY5VS82RmdSZDUrRWZCNTY3aU9hWmY4T05xQWcyR2dBQ0szb0lDcC9WbFNLQUdWSVRLbnVjaGlVeSIsInNhbHQiOiIyeWEyTnBVYXk4L0JMZ2Nkb3VZZXlsS3BvT04rSVplZ3A2aHlWRUxQWXM4Mk5UTUdHVHFuQlZnOHM3QWoxS0tLZ2lqb2Z3NlB0WFA4eTJXdnhIWkxTWktGIiwia2V5TGVuZ3RoIjo2NiwiaGFzaE1ldGhvZCI6InBia2RmMiIsIml0ZXJhdGlvbnMiOjcxNTA5fQ==
+  email: hello@example.com
+  claims:
+    admin: true
+```
+
+The example password for the `hello` user is `world`.
 
 ## Example
 
 ```
 npm install
-USERS_YML=yaml/users.yml MUSTACHE_DIRS="" SCRIPT_NAME="" HTTPS_ONLY=false PORT=9005 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin,express-mustache-overlays npm start
+DEBUG=express-mustache-jwt-signin:hash node lib/hash.js
+USERS_YML=yaml/users.yml MUSTACHE_DIRS="" SCRIPT_NAME="" HTTPS_ONLY=false PORT=9005 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin,express-mustache-overlays,express-mustache-jwt-signin:hash npm start
 ```
 
 You can also set these defaults:
@@ -217,10 +234,16 @@ Found. Redirecting to /user/signin
 
 ## Changelog
 
+### 0.2.6 2018-12-19
+
+* Added a password hashing page at `/hash` for users with the `admin: true` claim
+* Added `express-mustache-jwt-signin:hash` logger and for the `lib/loadUsers.js` module to treat passwords >= 64 characters in length as base64-encoded password hashes to be decoded and verified with `credential`
+
 ### 0.2.5 2018-12-17
 
 * Make `DASHBOARD_URL` configurable.
 * Added missing `js-yaml` dependency.
+* Changed `top.mustache` flexbox height
 
 ### 0.2.4 2018-12-15
 

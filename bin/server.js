@@ -56,8 +56,9 @@ const main = async () => {
 
   const adminURL = scriptName + '/admin'
   const dashboardURL = scriptName + '/dashboard'
+  const hashURL = scriptName + '/hash'
 
-  const templateDefaults = { title: 'Title', scriptName, dashboardURL, adminURL, signOutURL: scriptName + '/signout', signInURL: scriptName + '/signin' }
+  const templateDefaults = { title: 'Title', scriptName, dashboardURL, hashURL, adminURL, signOutURL: scriptName + '/signout', signInURL: scriptName + '/signin' }
   await setupMustache(app, templateDefaults, mustacheDirs)
 
   // Make req.user available to everything
@@ -80,6 +81,7 @@ const main = async () => {
     const action = req.path
     let password = ''
     let confirmPassword = ''
+    let hashed = ''
     if (req.method === 'POST') {
       password = req.body.password
       confirmPassword = req.body.confirm_password
@@ -91,12 +93,10 @@ const main = async () => {
         hashError = 'Passwords must match'
         error = true
       } else {
-        const hashed = await hashPassword(password)
-        res.send(hashed)
-        return
+        hashed = await hashPassword(password)
       }
     }
-    res.render('hash', { title: 'Hash', user: req.user, hashError, action })
+    res.render('hash', { title: 'Hash', user: req.user, hashed, hashError, action })
   })
 
   app.use(express.static(path.join(__dirname, '..', 'public')))
@@ -110,7 +110,13 @@ const main = async () => {
   // Error handler has to be last
   app.use(function (err, req, res, next) {
     debug('Error:', err)
-    res.status(500).send('Something broke!')
+    res.status(500)
+    try {
+      res.render('500', { user: req.user, scriptName })
+    } catch (e) {
+      debug('Error during rendering 500 page:', e)
+      res.send('Internal server error.')
+    }
   })
 
   app.listen(port, () => console.log(`Example app listening on port ${port}`))

@@ -4,6 +4,9 @@
         {{#hashError}}
         <div class="alert alert-danger">{{hashError}}</div>
         {{/hashError}}
+        {{#hashed}}
+        <div class="alert alert-success"><code>{{hashed}}</code></div>
+        {{/hashed}}
         <form method="POST" action="{{action}}">
           <div class="form-group">
             <label for="password">Password:</label>

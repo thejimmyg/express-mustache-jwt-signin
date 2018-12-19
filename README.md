@@ -5,11 +5,17 @@ outside the development team yet.**
 
 **CAUTION: Plain text only passwords are still possible.**
 
+**CAUTION: If you use the `express-mustache-jwt-signin:hash` logger (enabled by default), submitted passwords will be logged.**
+
 ## Password format in `yaml/users.yml`
 
 The `password` field can contain plain text or hashed passwords. If the password is more than 64 characters, it is treated as a hashed password.
 
 You need the `admin: true` claim in order to access `/hash` for generating a password hashes to go in `yaml/users.yml` and `/admin` to test whether you have the admin claim or not.
+
+The default password for the `hello` user in `yaml/users.yaml` is `world`.
+
+Here's an example for the `world` password, using a hash:
 
 ```
 hello:
@@ -18,8 +24,6 @@ hello:
   claims:
     admin: true
 ```
-
-The example password for the `hello` user is `world`.
 
 ## Example
 
@@ -233,6 +237,13 @@ Found. Redirecting to /user/signin
 
 
 ## Changelog
+
+### 0.2.7 2018-12-20
+
+* Adding a 500 handler
+* Moving nav links to the left hand side and inclusing `Hash`
+* Upaded docker config for `npm run docker:run`
+* Generated hashes now appear as a success message on the hash page, not a plain text response
 
 ### 0.2.6 2018-12-19
 

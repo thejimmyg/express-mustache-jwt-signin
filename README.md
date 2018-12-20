@@ -40,6 +40,9 @@ You can also set these defaults:
 * `COOKIE_NAME`
 * `FORBIDDEN_TEMPLATE`
 * `FORBIDDEN_TITLE`
+* `HTTPS_ONLY` - Defaults to `true` which means that your cookies won't be set over HTTP by default. Set this to `false` when debugging locally to make sure that your cookies are set for testing.
+
+**NOTE: Make sure you set `HTTPS_ONLY` to `false` if you want your cookies to work over HTTP for testing.**
 
 Visit http://localhost:9005 and sign in with username `hello` and password `world`.
 
@@ -238,7 +241,13 @@ Found. Redirecting to /user/signin
 
 ## Changelog
 
-### 0.2.7 2018-12-20
+### 0.2.8 2018-12-20
+
+* Added try, catch blocks around the async handlers
+* Logging the cookie options
+* Responding to the `HTTPS_ONLY` environment variable in the `lib/index.js`, rather than `bin/server.js` so that it takes effect in extrenal projects using `setupLogin()` too.
+
+### 0.2.7 2018-12-19
 
 * Adding a 500 handler
 * Moving nav links to the left hand side and inclusing `Hash`

@@ -12,13 +12,6 @@ if (scriptName.endsWith('/')){
   throw new Error('SCRIPT_NAME should not end with /.')
 }
 const port = process.env.PORT || 9005
-let httpsOnly = (process.env.HTTPS_ONLY || 'true').toLowerCase()
-if (httpsOnly === 'false') {
-  httpsOnly = false
-} else {
-  httpsOnly = true
-  debug('Only setting cookies for HTTPS access. If you can\'t log in, make sure you are accessing the server over HTTPS.')
-}
 const usersYml = process.env.USERS_YML || path.join(__dirname, '..', 'yaml', 'users.yml')
 const stat = fs.statSync(usersYml)
 if (!(stat && stat.isFile())) {
@@ -52,7 +45,7 @@ const main = async () => {
   const userData = await createCredentialsFromWatchedUsersYaml(usersYml)
 
   const app = express()
-  const { withUser, signedIn, hasClaims } = setupLogin(app, secret, userData.credentials, { httpsOnly })
+  const { withUser, signedIn, hasClaims } = setupLogin(app, secret, userData.credentials)
 
   const adminURL = scriptName + '/admin'
   const dashboardURL = scriptName + '/dashboard'
@@ -68,35 +61,50 @@ const main = async () => {
     res.redirect(dashboardURL)
   })
 
-  app.get(scriptName + '/dashboard', signedIn, (req, res) => {
-    res.render('main', { title: 'Dashboard', user: req.user, content: '<h1>Dashboard</h1><p>Not much to see here.</p>' })
-  })
-
-  app.get(scriptName + '/admin', hasClaims(claims => claims.admin), (req, res) => {
-    res.render('main', { title: 'Admin', user: req.user, content: '<h1>Admin</h1><p>Only those with the <tt>admin</tt> claim set to <tt>true</tt> can see this.</p>' })
-  })
-
-  app.all(scriptName + '/hash', hasClaims(claims => claims.admin), async (req, res) => {
-    let hashError = ''
-    const action = req.path
-    let password = ''
-    let confirmPassword = ''
-    let hashed = ''
-    if (req.method === 'POST') {
-      password = req.body.password
-      confirmPassword = req.body.confirm_password
-      let error = false
-      if (!password.length) {
-        hashError = 'Please enter a password'
-        error = true
-      } else if (password !== confirmPassword) {
-        hashError = 'Passwords must match'
-        error = true
-      } else {
-        hashed = await hashPassword(password)
-      }
+  app.get(scriptName + '/dashboard', signedIn, async (req, res, next) => {
+    try {
+      res.render('main', { title: 'Dashboard', user: req.user, content: '<h1>Dashboard</h1><p>Not much to see here.</p>' })
+    } catch (e) {
+      debug(e)
+      next(e)
     }
-    res.render('hash', { title: 'Hash', user: req.user, hashed, hashError, action })
+  })
+
+  app.get(scriptName + '/admin', hasClaims(claims => claims.admin), async (req, res, next) => {
+    try {
+      res.render('main', { title: 'Admin', user: req.user, content: '<h1>Admin</h1><p>Only those with the <tt>admin</tt> claim set to <tt>true</tt> can see this.</p>' })
+    } catch (e) {
+      debug(e)
+      next(e)
+    }
+  })
+
+  app.all(scriptName + '/hash', hasClaims(claims => claims.admin), async (req, res, next) => {
+    try {
+      let hashError = ''
+      const action = req.path
+      let password = ''
+      let confirmPassword = ''
+      let hashed = ''
+      if (req.method === 'POST') {
+        password = req.body.password
+        confirmPassword = req.body.confirm_password
+        let error = false
+        if (!password.length) {
+          hashError = 'Please enter a password'
+          error = true
+        } else if (password !== confirmPassword) {
+          hashError = 'Passwords must match'
+          error = true
+        } else {
+          hashed = await hashPassword(password)
+        }
+      }
+      res.render('hash', { title: 'Hash', user: req.user, hashed, hashError, action })
+    } catch (e) {
+      debug(e)
+      next(e)
+    }
   })
 
   app.use(express.static(path.join(__dirname, '..', 'public')))

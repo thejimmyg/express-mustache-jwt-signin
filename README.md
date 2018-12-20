@@ -241,10 +241,15 @@ Found. Redirecting to /user/signin
 
 ## Changelog
 
+### 0.2.12 2018-12-20
+
+* Include `Sign Out` link and `Admin` claim in `userStatus.partial`
+
 ### 0.2.11 2018-12-20
 
-* Fix error message from `rest` not correctly specifying key names
+* Set `res.locals.user` in the `withUser` middleware
 * Pass config directly to the middleware
+* Fix error message from `rest` not correctly specifying key names
 
 ### 0.2.10 2018-12-20
 

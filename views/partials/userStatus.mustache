@@ -1,0 +1,9 @@
+          {{#user}}
+          <p>
+            <strong>{{username}}</strong>
+            <a href="{{signOutURL}}">Signout</a>
+          </p>
+          {{/user}}
+          {{^user}}
+            <p><a href="{{signInURL}}">Sign In</a></p>
+          {{/user}}

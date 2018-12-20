@@ -30,7 +30,7 @@ hello:
 ```
 npm install
 DEBUG=express-mustache-jwt-signin:hash node lib/hash.js
-USERS_YML=yaml/users.yml MUSTACHE_DIRS="" SCRIPT_NAME="" HTTPS_ONLY=false PORT=9005 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin,express-mustache-overlays,express-mustache-jwt-signin:hash npm start
+USERS_YML=yaml/users.yml MUSTACHE_DIRS="" SCRIPT_NAME="" HTTPS_ONLY=false PORT=8000 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin,express-mustache-jwt-signin:credentials,express-mustache-jwt-signin:hash,express-mustache-overlays npm start
 ```
 
 You can also set these defaults:
@@ -44,7 +44,7 @@ You can also set these defaults:
 
 **NOTE: Make sure you set `HTTPS_ONLY` to `false` if you want your cookies to work over HTTP for testing.**
 
-Visit http://localhost:9005 and sign in with username `hello` and password `world`.
+Visit http://localhost:8000 and sign in with username `hello` and password `world`.
 
 User information in this example is loaded from `yaml/users.yml` via the
 `express-mustache-jwt-signin/lib/loadUsers` module.
@@ -205,9 +205,9 @@ Login:
 
 ```
 # Success
-curl -X POST -v --data "username=hello&password=world" http://localhost:9005/user/signin
+curl -X POST -v --data "username=hello&password=world" http://localhost:8000/user/signin
 # Failure
-curl -X POST -v --data "username=hello&password=INVALID" http://localhost:9005/user/signin
+curl -X POST -v --data "username=hello&password=INVALID" http://localhost:8000/user/signin
 ```
 
 Accessing via cookie or Authorization header:
@@ -217,11 +217,11 @@ Accessing via cookie or Authorization header:
 export VALID_JWT="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoiaGVsbG8iLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNTQzNTg4MjE3fQ.Uj5-C3seMxxrg_H7NaDYoh4LgKE_Br4jIAPzSt8Jyic"
 export INVALID_JWT="${VALID_JWT}_invalid"
 # Valid
-curl -H "Authorization: Bearer $VALID_JWT" http://localhost:9005/user/dashboard
-curl --cookie "jwt=$VALID_JWT;" http://localhost:9005/user/dashboard
+curl -H "Authorization: Bearer $VALID_JWT" http://localhost:8000/user/dashboard
+curl --cookie "jwt=$VALID_JWT;" http://localhost:8000/user/dashboard
 # Invalid
-curl -H "Authorization: Bearer $INVALID_JWT" http://localhost:9005/user/dashboard
-curl --cookie "jwt=$INVALID_JWT;" http://localhost:9005/user/dashboard
+curl -H "Authorization: Bearer $INVALID_JWT" http://localhost:8000/user/dashboard
+curl --cookie "jwt=$INVALID_JWT;" http://localhost:8000/user/dashboard
 ```
 
 At the moment only JWTs with HS256 will be allowed. You can verify this with a
@@ -229,7 +229,7 @@ token that uses a different algorithm like this one which uses `HS512`:
 
 ```
 export ALG_JWT="eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoiaGVsbG8iLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNTQzNTg4MjE3fQ.eym-MugNjwzmD114trr6Mss5KpenDB42MONCDqmaBJyDBisQHCehqoMyPqC80uFtIkwo3uP8N_5Vn9lbYPLB6g"
-curl --cookie "jwt=$ALG_JWT;" http://localhost:9005/user/dashboard
+curl --cookie "jwt=$ALG_JWT;" http://localhost:8000/user/dashboard
 ```
 
 You'll see:
@@ -240,6 +240,10 @@ Found. Redirecting to /user/signin
 
 
 ## Changelog
+
+### 0.2.9 2018-12-20
+
+* Upgrade to `express-mustache-overlays` version 0.2.1
 
 ### 0.2.8 2018-12-20
 

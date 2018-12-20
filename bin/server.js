@@ -2,22 +2,13 @@ const express = require('express')
 const fs = require('fs')
 const debug = require('debug')('express-mustache-jwt-signin')
 const path = require('path')
-
-// Change the MUSTACHE_DIRS variable to use the views directory if neccessary
-const MUSTACHE_DIRS = process.env.MUSTACHE_DIRS ? process.env.MUSTACHE_DIRS.split(':') : []
-MUSTACHE_DIRS.push(path.normalize(path.join(__dirname, '..', 'views')))
-process.env.MUSTACHE_DIRS = MUSTACHE_DIRS.join(':')
-// Change the PUBLIC_FILES_DIRS variable to use the views directory if neccessary
-const PUBLIC_FILES_DIRS = process.env.PUBLIC_FILES_DIRS ? process.env.PUBLIC_FILES_DIRS.split(':') : []
-PUBLIC_FILES_DIRS.push(path.normalize(path.join(__dirname, '..', 'public')))
-process.env.PUBLIC_FILES_DIRS = PUBLIC_FILES_DIRS.join(':')
-
 const { setupMustacheOverlays, setupErrorHandlers } = require('express-mustache-overlays')
 const { setupLogin } = require('../lib')
 const { createCredentialsFromWatchedUsersYaml } = require('../lib/loadUsers')
 const { hashPassword } = require('../lib/hash')
 
-const port = process.env.PORT || 9005
+
+const port = process.env.PORT || 80
 const usersYml = process.env.USERS_YML || path.join(__dirname, '..', 'yaml', 'users.yml')
 const stat = fs.statSync(usersYml)
 if (!(stat && stat.isFile())) {
@@ -43,12 +34,19 @@ if (!secret || secret.length < 8) {
 // or
 //
 // Use the createCredentialsFromWatchedUsersYaml to specify users in a yaml file as we do here.
+const mustacheDirs = process.env.mustacheDirs ? process.env.MUSTACHE_DIRS.split(':') : []
+const publicFilesDirs = process.env.publicFilesDirs ? process.env.PUBLIC_FILES_DIRS.split(':') : []
+const scriptName = process.env.SCRIPT_NAME || ''
+const publicURLPath = process.env.PUBLIC_URL_PATH || scriptName + '/public'
 
 const main = async () => {
+  mustacheDirs.push(path.normalize(path.join(__dirname, '..', 'views')))
+  publicFilesDirs.push(path.normalize(path.join(__dirname, '..', 'public')))
+
   const userData = await createCredentialsFromWatchedUsersYaml(usersYml)
 
   const app = express()
-  const { scriptName, publicURLPath } = await setupMustacheOverlays(app)
+  await setupMustacheOverlays(app, {mustacheDirs, publicFilesDirs, scriptName, publicURLPath})
 
   const adminURL = scriptName + '/admin'
   const dashboardURL = scriptName + '/dashboard'

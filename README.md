@@ -241,6 +241,10 @@ Found. Redirecting to /user/signin
 
 ## Changelog
 
+### 0.2.10 2018-12-20
+
+* Upgrade to `express-mustache-overlays` version 0.2.2
+
 ### 0.2.9 2018-12-20
 
 * Upgrade to `express-mustache-overlays` version 0.2.1

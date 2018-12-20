@@ -241,6 +241,11 @@ Found. Redirecting to /user/signin
 
 ## Changelog
 
+### 0.2.11 2018-12-20
+
+* Fix error message from `rest` not correctly specifying key names
+* Pass config directly to the middleware
+
 ### 0.2.10 2018-12-20
 
 * Upgrade to `express-mustache-overlays` version 0.2.2

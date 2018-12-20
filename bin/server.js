@@ -38,6 +38,11 @@ const mustacheDirs = process.env.mustacheDirs ? process.env.MUSTACHE_DIRS.split(
 const publicFilesDirs = process.env.publicFilesDirs ? process.env.PUBLIC_FILES_DIRS.split(':') : []
 const scriptName = process.env.SCRIPT_NAME || ''
 const publicURLPath = process.env.PUBLIC_URL_PATH || scriptName + '/public'
+const adminURL = scriptName + '/admin'
+const dashboardURL = scriptName + '/dashboard'
+const hashURL = scriptName + '/hash'
+const signOutURL = scriptName + '/signout'
+const signInURL = scriptName + '/signin'
 
 const main = async () => {
   mustacheDirs.push(path.normalize(path.join(__dirname, '..', 'views')))
@@ -48,24 +53,7 @@ const main = async () => {
   const app = express()
   await setupMustacheOverlays(app, {mustacheDirs, publicFilesDirs, scriptName, publicURLPath})
 
-  const adminURL = scriptName + '/admin'
-  const dashboardURL = scriptName + '/dashboard'
-  const hashURL = scriptName + '/hash'
-
-  app.use((req, res, next) => {
-    debug('Setting up locals')
-    res.locals = Object.assign({}, res.locals, { publicURLPath, scriptName, title: 'Express Mustache JWT Sign In', dashboardURL, hashURL, adminURL, signOutURL: scriptName + '/signout', signInURL: scriptName + '/signin' })
-    next()
-  })
-
-  const { withUser, signedIn, hasClaims } = setupLogin(app, secret, userData.credentials)
-  app.use(withUser)
-
-  app.use((req, res, next) => {
-    debug('Setting up user locals')
-    res.locals = Object.assign({}, res.locals, { user: req.user })
-    next()
-  })
+  const { withUser, signedIn, hasClaims } = setupLogin(app, secret, userData.credentials, { publicURLPath, scriptName, title: 'Express Mustache JWT Sign In', dashboardURL, hashURL, adminURL, signOutURL, signInURL })
 
   app.get(scriptName + '/', (req, res) => {
     res.redirect(dashboardURL)

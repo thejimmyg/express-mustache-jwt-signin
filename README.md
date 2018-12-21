@@ -86,7 +86,12 @@ the middleware and a set of routes, templates and handlers that allows a user
 to sign in and out with a web interface. `setupLogin` calls `setupMiddelware`
 internally as part of its setup.
 
-**`setupMiddleware(secret, [options])`**
+**`await setupMiddleware(secret, [options])`**
+
+Options:
+* `signInURL` - The URL path you want the sign in page to appear at, e.g. `'/signin'`
+* `signOutURL` - The URL path you want the sign out page to appear at, e.g. `'/signout'`
+* `overlays` - Add the default templates etc
 
 Returns:
 
@@ -114,6 +119,9 @@ An object with the following optional keys:
 
 * `jwtCookieName` - The name to use for the cookie that will contain the JWT, e.g. `jwt`
 * `signInURL` - The URL path you want the sign in page to appear at, e.g. `'/signin'`
+* `signOutURL` - The URL path you want the sign out page to appear at, e.g. `'/signout'`
+* `signInTitle` - The title of the sign in page, e.g. 'Sign In'
+* `signedOutTitle` - The title of the signed out page, e.g. 'Signed Out'
 * `extractTokenFromRequest` - A function that is passed the request `req` and
   the cookie name `jwtCookieName` and is expected to reurn the JWT as a string.
   The default implementation will obtain a JWT from a cookie first, or the
@@ -122,7 +130,7 @@ An object with the following optional keys:
 * `forbiddenTemplate` - the name of the template to render by `hasClaims` if the check fails
 * `forbiddenTitle` - the title to give the page rendered by `hasClaims` if the check fails
 
-**`setupLogin(app, secret, credentials, [options])`**
+**`await setupLogin(app, secret, credentials, [options])`**
 
 Sets up the `withUser` middleware to populate `req.user` as well as routes for
 signing a user in and out.
@@ -178,6 +186,7 @@ Options:
 * `signInTemplate` - e.g. `'signIn'`
 * `signedOutTitle` - e.g. `'Signed Out'`
 * `signInTitle` - e.g. `'Sign In'`
+* `signedOutTitle` - e.g. `'Signed Out'`
 
 
 ## Development
@@ -240,6 +249,14 @@ Found. Redirecting to /user/signin
 
 
 ## Changelog
+
+### 0.3.0 2018-12-21
+
+* Refactor for `express-mustache-overlays` 0.3.0, and updated example
+* Change the API to require an `overlays` argument in `setupLogin` and have it as an optional requirement in `setupMiddleware`
+* `setupMiddleware` is now async and so requires awaiting
+* No environment variables needed in `lib`
+* More variables configurable from the environment
 
 ### 0.2.12 2018-12-20
 

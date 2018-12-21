@@ -1,13 +1,13 @@
 {
   "name": "express-mustache-jwt-signin",
-  "version": "0.2.12",
+  "version": "0.3.0",
   "description": "A sign in example",
   "scripts": {
-    "docker:build": "docker build . -t thejimmyg/express-mustache-jwt-signin:0.2.12",
-    "docker:push": "docker push thejimmyg/express-mustache-jwt-signin:0.2.12",
+    "docker:build": "docker build . -t thejimmyg/express-mustache-jwt-signin:0.3.0",
+    "docker:push": "docker push thejimmyg/express-mustache-jwt-signin:0.3.0",
     "docker:build:test": "docker build . -t thejimmyg/express-mustache-jwt-signin:test",
     "docker:push:test": "docker push thejimmyg/express-mustache-jwt-signin:test",
-    "docker:run": "docker run -e USERS_YML='yaml/users.yml' -e MUSTACHE_DIRS='' -e SCRIPT_NAME='' -e HTTPS_ONLY=false -e DEBUG'=express-mustache-jwt-signin,express-mustache-overlays,express-mustache-jwt-signin:hash' -e PORT=80 -e SECRET='reallysecret' --init -p 80:80 -v \"`pwd`/yaml:/app/yaml\" thejimmyg/express-mustache-jwt-signin:0.2.12",
+    "docker:run": "docker run -e USERS_YML='yaml/users.yml' -e MUSTACHE_DIRS='' -e SCRIPT_NAME='' -e HTTPS_ONLY=false -e DEBUG'=express-mustache-jwt-signin,express-mustache-overlays,express-mustache-jwt-signin:hash,express-mustache-jwt-signin:credentials' -e PORT=80 -e SECRET='reallysecret' --init -p 80:80 -v \"`pwd`/yaml:/app/yaml\" thejimmyg/express-mustache-jwt-signin:0.3.0",
     "start": "node bin/server.js",
     "fix": "standard --fix index.js bin/*.js lib/*.js"
   },
@@ -19,7 +19,7 @@
     "credential": "^2.0.0",
     "debug": "^4.1.0",
     "express": "^4.16.4",
-    "express-mustache-overlays": "^0.2.2",
+    "express-mustache-overlays": "^0.3.0",
     "js-yaml": "^3.12.0",
     "jsonwebtoken": "^8.4.0",
     "lodash": "^4.17.11"

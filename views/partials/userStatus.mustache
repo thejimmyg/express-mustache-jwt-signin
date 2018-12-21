@@ -7,3 +7,8 @@
             <a href="{{signOutURL}}">Sign Out</a>
           </p>
           {{/user}}
+          {{^user}}
+          <p>
+            <a href="{{signInURL}}">Sign In</a>
+          </p>
+          {{/user}}

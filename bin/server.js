@@ -2,11 +2,11 @@ const express = require('express')
 const fs = require('fs')
 const debug = require('debug')('express-mustache-jwt-signin')
 const path = require('path')
-const { setupMustacheOverlays, setupErrorHandlers } = require('express-mustache-overlays')
+const { setupErrorHandlers } = require('express-mustache-overlays')
 const { setupLogin } = require('../lib')
 const { createCredentialsFromWatchedUsersYaml } = require('../lib/loadUsers')
 const { hashPassword } = require('../lib/hash')
-
+const { prepareMustacheOverlays } = require('express-mustache-overlays')
 
 const port = process.env.PORT || 80
 const usersYml = process.env.USERS_YML || path.join(__dirname, '..', 'yaml', 'users.yml')
@@ -43,17 +43,41 @@ const dashboardURL = scriptName + '/dashboard'
 const hashURL = scriptName + '/hash'
 const signOutURL = scriptName + '/signout'
 const signInURL = scriptName + '/signin'
+const title = 'Express Mustache JWT Sign In'
+
+const SIGN_IN_TITLE = process.env.SIGN_IN_TITLE || 'Sign In'
+const SIGNED_OUT_TITLE = process.env.SIGNED_OUT_TITLE || 'Sign Out'
+const COOKIE_NAME = process.env.COOKIE_NAME || 'jwt'
+const FORBIDDEN_TEMPLATE = process.env.FORBIDDEN_TEMPLATE || '403'
+const FORBIDDEN_TITLE = process.env.FORBIDDEN_TITLE || 'Forbidden'
+let HTTPS_ONLY = (process.env.HTTPS_ONLY || 'true').toLowerCase()
+if (HTTPS_ONLY === 'false') {
+  HTTPS_ONLY = false
+} else {
+  HTTPS_ONLY = true
+  debug('Only setting cookies for HTTPS access. If you can\'t log in, make sure you are accessing the server over HTTPS.')
+}
 
 const main = async () => {
-  mustacheDirs.push(path.normalize(path.join(__dirname, '..', 'views')))
-  publicFilesDirs.push(path.normalize(path.join(__dirname, '..', 'public')))
-
   const userData = await createCredentialsFromWatchedUsersYaml(usersYml)
-
   const app = express()
-  await setupMustacheOverlays(app, {mustacheDirs, publicFilesDirs, scriptName, publicURLPath})
+  const overlays = await prepareMustacheOverlays(app, { scriptName, publicURLPath, title })
 
-  const { withUser, signedIn, hasClaims } = setupLogin(app, secret, userData.credentials, { publicURLPath, scriptName, title: 'Express Mustache JWT Sign In', dashboardURL, hashURL, adminURL, signOutURL, signInURL })
+  const { withUser, signedIn, hasClaims } = await setupLogin(app, secret, userData.credentials, overlays, {
+    dashboardURL,
+    hashURL,
+    adminURL,
+    signOutURL,
+    signInURL,
+    cookieName: COOKIE_NAME,
+    forbiddenTitle: FORBIDDEN_TITLE,
+    httpsOnly: HTTPS_ONLY,
+    forbiddenTemplate: FORBIDDEN_TEMPLATE,
+    signInTitle: SIGN_IN_TITLE,
+    signedOutTitle: SIGNED_OUT_TITLE
+  })
+
+  app.use(withUser)
 
   app.get(scriptName + '/', (req, res) => {
     res.redirect(dashboardURL)
@@ -101,6 +125,17 @@ const main = async () => {
       next(e)
     }
   })
+
+  // Set up any other overlays directories here
+  mustacheDirs.forEach(dir => {
+    overlays.overlayMustacheDir(dir)
+  })
+  publicFilesDirs.forEach(dir => {
+    overlays.overlayPublicFilesDir(dir)
+  })
+
+  // Put the overlays into place after you've set up any more overlays you need, but definitely before the error handlers
+  await overlays.setup()
 
   // Keep this right at the end, immediately before listening
   setupErrorHandlers(app)

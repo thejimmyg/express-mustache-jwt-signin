@@ -18,6 +18,7 @@ const secret = process.env.SECRET
 if (!secret || secret.length < 8) {
   throw new Error('No SECRET environment variable set, or the SECRET is too short. Need 8 characters')
 }
+
 // const credentials = {
 //   'hello': { password: 'world', claims: {'admin': true} }
 // }
@@ -34,8 +35,9 @@ if (!secret || secret.length < 8) {
 // or
 //
 // Use the createCredentialsFromWatchedUsersYaml to specify users in a yaml file as we do here.
-const mustacheDirs = process.env.mustacheDirs ? process.env.MUSTACHE_DIRS.split(':') : []
-const publicFilesDirs = process.env.publicFilesDirs ? process.env.PUBLIC_FILES_DIRS.split(':') : []
+
+const mustacheDirs = process.env.MUSTACHE_DIRS ? process.env.MUSTACHE_DIRS.split(':') : []
+const publicFilesDirs = process.env.PUBLIC_FILES_DIRS ? process.env.PUBLIC_FILES_DIRS.split(':') : []
 const scriptName = process.env.SCRIPT_NAME || ''
 const publicURLPath = process.env.PUBLIC_URL_PATH || scriptName + '/public'
 const adminURL = scriptName + '/admin'
@@ -128,9 +130,11 @@ const main = async () => {
 
   // Set up any other overlays directories here
   mustacheDirs.forEach(dir => {
+    debug('Adding mustache dir:', dir)
     overlays.overlayMustacheDir(dir)
   })
   publicFilesDirs.forEach(dir => {
+    debug('Adding public files dir:', dir)
     overlays.overlayPublicFilesDir(dir)
   })
 

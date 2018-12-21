@@ -30,8 +30,10 @@ hello:
 ```
 npm install
 DEBUG=express-mustache-jwt-signin:hash node lib/hash.js
-USERS_YML=yaml/users.yml MUSTACHE_DIRS="" SCRIPT_NAME="" HTTPS_ONLY=false PORT=8000 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin,express-mustache-jwt-signin:credentials,express-mustache-jwt-signin:hash,express-mustache-overlays npm start
+USERS_YML=yaml/users.yml MUSTACHE_DIRS="views-overlay" PUBLIC_FILES_DIRS="public-overlay" SCRIPT_NAME="" HTTPS_ONLY=false PORT=8000 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin,express-mustache-jwt-signin:credentials,express-mustache-jwt-signin:hash,express-mustache-overlays npm start
 ```
+
+You should be able to see the public file overlay at http://localhost:8000/public/hello.txt
 
 You can also set these defaults:
 
@@ -249,6 +251,11 @@ Found. Redirecting to /user/signin
 
 
 ## Changelog
+
+### 0.3.1 2018-12-21
+
+* Default port for `Dockerfile` is now 80
+* Fixed a bug with `MUSTACHE_DIRS` and `PUBLIC_FILES_DIRS` not working correctly from the example
 
 ### 0.3.0 2018-12-21
 

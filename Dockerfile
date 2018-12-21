@@ -17,7 +17,7 @@ COPY public/ /app/public/
 # Note that when running from Docker, we don't use the development yaml/users.yml
 # you are expected to mount your own `yaml` volume containing your `users.yml` into `/app/yaml`.
 WORKDIR /app
-EXPOSE 9005
+EXPOSE 80
 ENV NODE_PATH=/app/node_modules
 ENV NODE_ENV=production
 ENV PATH="${PATH}:/app/node_modules/.bin"

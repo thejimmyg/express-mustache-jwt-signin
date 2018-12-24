@@ -252,6 +252,11 @@ Found. Redirecting to /user/signin
 
 ## Changelog
 
+### 0.3.2 2018-12-24
+
+* Support `DASHBOARD_URL`
+* Add `makeStaticWithUser()` function
+
 ### 0.3.1 2018-12-21
 
 * Default port for `Dockerfile` is now 80

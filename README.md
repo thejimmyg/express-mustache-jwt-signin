@@ -197,6 +197,51 @@ Options:
 npm run fix
 ```
 
+A typical way of setting up this middleware in an app is as follows:
+
+```
+const express = require('express')
+const { makeStaticWithUser, setupMiddleware } = require('express-mustache-jwt-signin')
+
+const signInURL = process.env.SIGN_IN_URL || '/user/signin'
+const signOutURL = process.env.SIGN_OUT_URL || '/user/signout'
+const secret = process.env.SECRET
+const disableAuth = ((process.env.DISABLE_AUTH || 'false').toLowerCase() === 'true')
+if (!disableAuth) {
+  if (!secret || secret.length < 8) {
+    throw new Error('No SECRET environment variable set, or the SECRET is too short. Need 8 characters')
+  }
+  if (!signInURL) {
+    throw new Error('No SIGN_IN_URL environment variable set')
+  }
+} else {
+  debug('Disabled auth')
+}
+const disabledAuthUser = process.env.DISABLED_AUTH_USER
+
+
+const main = async () => {
+  app = express()
+  const authMiddleware = await setupMiddleware(app, secret, { overlays, signOutURL, signInURL })
+  const { signedIn, hasClaims } = authMiddleware
+  let { withUser } = authMiddleware
+  if (disableAuth) {
+    withUser = makeStaticWithUser(JSON.parse(disabledAuthUser || 'null'))
+  }
+  app.use(withUser)
+  ...
+}
+```
+
+With this setup you can set `DISABLE_AUTH` to true to put the auth system into development mode allowing cookies to be set over HTTP (and not just HTTPS) and forcing the currently signed-in user to be set from the `DISABLED_AUTH_USER` environment variable rather than via the real sign in system.
+
+This means you can then start your app in development mode using something like this:
+
+```
+SECRET=reallysecret DISABLE_AUTH=true DISABLED_AUTH_USER='{"admin": true, "username": "disableduser"}' npm start
+```
+
+
 ## Docker
 
 ```
@@ -251,6 +296,12 @@ Found. Redirecting to /user/signin
 
 
 ## Changelog
+
+
+### 0.3.3 2019-01-02
+
+* Handle SIGTERM
+* Included an example of using the middleware in another app.
 
 ### 0.3.2 2018-12-24
 

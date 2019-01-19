@@ -1,14 +1,10 @@
           {{#user}}
-          <p>
             {{#user.admin}}
             Admin
             {{/user.admin}}
             <strong>{{username}}</strong>
-            <a href="{{signOutURL}}">Sign Out</a>
-          </p>
+            <a href="{{signOutUrl}}">Sign Out</a>
           {{/user}}
           {{^user}}
-          <p>
-            <a href="{{signInURL}}">Sign In</a>
-          </p>
+            <a href="{{signInUrl}}">Sign In</a>
           {{/user}}

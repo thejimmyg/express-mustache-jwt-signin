@@ -2,11 +2,10 @@ const express = require('express')
 const fs = require('fs')
 const debug = require('debug')('express-mustache-jwt-signin')
 const path = require('path')
-const { setupErrorHandlers } = require('express-mustache-overlays')
-const { setupLogin } = require('../lib')
+const { setupLogin, signInOptionsFromEnv, appOptionsFromEnv } = require('../lib')
 const { createCredentialsFromWatchedUsersYaml } = require('../lib/loadUsers')
 const { hashPassword } = require('../lib/hash')
-const { prepareMustacheOverlays } = require('express-mustache-overlays')
+const { overlaysOptionsFromEnv, overlaysDirsFromEnv, prepareMustacheOverlays, setupErrorHandlers } = require('express-mustache-overlays')
 
 const port = process.env.PORT || 80
 const usersYml = process.env.USERS_YML || path.join(__dirname, '..', 'yaml', 'users.yml')
@@ -36,53 +35,29 @@ if (!secret || secret.length < 8) {
 //
 // Use the createCredentialsFromWatchedUsersYaml to specify users in a yaml file as we do here.
 
-const mustacheDirs = process.env.MUSTACHE_DIRS ? process.env.MUSTACHE_DIRS.split(':') : []
-const publicFilesDirs = process.env.PUBLIC_FILES_DIRS ? process.env.PUBLIC_FILES_DIRS.split(':') : []
-const scriptName = process.env.SCRIPT_NAME || ''
-const publicURLPath = process.env.PUBLIC_URL_PATH || scriptName + '/public'
-const adminURL = scriptName + '/admin'
-const dashboardURL = process.env.DASHBOARD_URL || scriptName + '/dashboard'
-const hashURL = scriptName + '/hash'
-const signOutURL = scriptName + '/signout'
-const signInURL = scriptName + '/signin'
-const title = 'Express Mustache JWT Sign In'
+const overlaysOptions = overlaysOptionsFromEnv()
+const { scriptName } = overlaysOptions
+const { mustacheDirs, publicFilesDirs } = overlaysDirsFromEnv()
 
-const SIGN_IN_TITLE = process.env.SIGN_IN_TITLE || 'Sign In'
-const SIGNED_OUT_TITLE = process.env.SIGNED_OUT_TITLE || 'Sign Out'
-const COOKIE_NAME = process.env.COOKIE_NAME || 'jwt'
-const FORBIDDEN_TEMPLATE = process.env.FORBIDDEN_TEMPLATE || '403'
-const FORBIDDEN_TITLE = process.env.FORBIDDEN_TITLE || 'Forbidden'
-let HTTPS_ONLY = (process.env.HTTPS_ONLY || 'true').toLowerCase()
-if (HTTPS_ONLY === 'false') {
-  HTTPS_ONLY = false
-} else {
-  HTTPS_ONLY = true
-  debug('Only setting cookies for HTTPS access. If you can\'t log in, make sure you are accessing the server over HTTPS.')
-}
+// const scriptName = process.env.SCRIPT_NAME || ''
+// const publicUrlPath = process.env.PUBLIC_URL_PATH || scriptName + '/public'
+// const title = 'Express Mustache JWT Sign In'
+
+const signInOptions = signInOptionsFromEnv()
+const { signInUrl = scriptName + '/signin', signOutUrl = scriptName + '/signout' } = signInOptions
+const appOptions = appOptionsFromEnv(scriptName)
+const { dashboardUrl } = appOptions
 
 const main = async () => {
   const userData = await createCredentialsFromWatchedUsersYaml(usersYml)
   const app = express()
-  const overlays = await prepareMustacheOverlays(app, { scriptName, publicURLPath, title })
+  const overlays = await prepareMustacheOverlays(app, overlaysOptions)
 
-  const { withUser, signedIn, hasClaims } = await setupLogin(app, secret, userData.credentials, overlays, {
-    dashboardURL,
-    hashURL,
-    adminURL,
-    signOutURL,
-    signInURL,
-    cookieName: COOKIE_NAME,
-    forbiddenTitle: FORBIDDEN_TITLE,
-    httpsOnly: HTTPS_ONLY,
-    forbiddenTemplate: FORBIDDEN_TEMPLATE,
-    signInTitle: SIGN_IN_TITLE,
-    signedOutTitle: SIGNED_OUT_TITLE
-  })
-
+  const { withUser, signedIn, hasClaims } = await setupLogin(app, secret, userData.credentials, overlays, Object.assign({}, signInOptions, appOptions, { signInUrl, signOutUrl }))
   app.use(withUser)
 
   app.get(scriptName + '/', (req, res) => {
-    res.redirect(dashboardURL)
+    res.redirect(dashboardUrl)
   })
 
   app.get(scriptName + '/dashboard', signedIn, async (req, res, next) => {
@@ -142,7 +117,7 @@ const main = async () => {
   await overlays.setup()
 
   // Keep this right at the end, immediately before listening
-  setupErrorHandlers(app)
+  await setupErrorHandlers(app, { debug })
 
   app.listen(port, () => console.log(`Example app listening on port ${port}`))
 }

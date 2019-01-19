@@ -33,18 +33,26 @@ DEBUG=express-mustache-jwt-signin:hash node lib/hash.js
 USERS_YML=yaml/users.yml MUSTACHE_DIRS="views-overlay" PUBLIC_FILES_DIRS="public-overlay" SCRIPT_NAME="" HTTPS_ONLY=false PORT=8000 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin,express-mustache-jwt-signin:credentials,express-mustache-jwt-signin:hash,express-mustache-overlays npm start
 ```
 
-You should be able to see the public file overlay at http://localhost:8000/public/hello.txt
-
 You can also set these defaults:
 
-* `DASHBOARD_URL` - where the sign in should redirect to
-* `SIGN_IN_URL`
-* `COOKIE_NAME`
-* `FORBIDDEN_TEMPLATE`
-* `FORBIDDEN_TITLE`
-* `HTTPS_ONLY` - Defaults to `true` which means that your cookies won't be set over HTTP by default. Set this to `false` when debugging locally to make sure that your cookies are set for testing.
+* `SIGN_IN_URL` - The URL path that the sign in page appears at
+* `SIGN_OUT_URL` - The URL the user should visit to sign out
+* `COOKIE_NAME` - The name of the auth cookie, default `'jwt'`
+* `FORBIDDEN_TEMPLATE` - The template to use when the user doesn't have the correct permissions. Default `'403'`
+* `FORBIDDEN_TITLE`- The title of the forbidden page template
 
 **NOTE: Make sure you set `HTTPS_ONLY` to `false` if you want your cookies to work over HTTP for testing.**
+
+As well as:
+
+* `DASHBOARD_URL` - URL that the sign in should redirect to when successful. Can be a full URL or a path. e.g `/dashboard'
+* `HASH_URL` - URL path to the password hash generator screen in the example
+* `ADMIN_URL` - URL path to the admin information screen in the example
+* `HTTPS_ONLY` - Defaults to `true` which means that your cookies won't be set over HTTP by default. Set this to `false` when debugging locally to make sure that your cookies are set for testing.
+* `SIGN_IN_TITLE` - Title for the sign in page
+* `SIGNED_OUT_TITLE` - Title for the signed out page
+
+You can use all the express-mustache-overlays options including `WITH_PJAX_PWA=true`.
 
 Visit http://localhost:8000 and sign in with username `hello` and password `world`.
 
@@ -297,6 +305,12 @@ Found. Redirecting to /user/signin
 
 ## Changelog
 
+
+### 0.4.0 2019-01-19
+
+* Upgraded to express-mustache-overlays 0.4.2
+* Renamed all `*URL` variables that aren't environment variables to `*Url` e.g. `signInURL` -> `signInUrl` **Caution: This means your templates that use these variables will need to be updated.**
+* Added `signInOptionsFromEnv()` function
 
 ### 0.3.3 2019-01-02
 

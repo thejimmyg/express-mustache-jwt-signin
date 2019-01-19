@@ -1,21 +1,31 @@
-{{>top}}        
+{{>top}}
       <div class="p-3 flex-grow-1">
         <h1>Sign In</h1>
         {{>signin_top}}
         {{#signInError}}
         <div class="alert alert-danger">{{signInError}}</div>
         {{/signInError}}
-        <form method="POST" action="{{action}}">
+        <form id="data-pjax" method="POST" action="{{action}}">
           <div class="form-group">
             <label for="username">Username:</label>
-            <input class="form-control" type="text" placeholder="Username" name="username" value="{{username}}">
+            <input class="form-control" id="username" type="text" placeholder="Username" name="username" value="{{username}}">
           </div>
           <div class="form-group">
             <label for="password">Password:</label>
-            <input class="form-control" type="password" placeholder="Password" name="password">
+            <input class="form-control" id="password" type="password" placeholder="Password" name="password">
           </div>
           <button class="btn btn-primary" type="submit">Sign In</button>
         </form>
         {{>signInBottom}}
+        <script type="application/javascript">
+          {{^username}}$("#username").focus(){{/username}}
+          {{#withPjaxPwa}}
+          // Note an external 301 redirect will be performed by the server anyway if
+          // successful so there will be a full reload
+          $(document).on('submit', 'form[data-pjax]', function(event) {
+            $.pjax.submit(event, '#pjax-container')
+          })
+          {{/withPjaxPwa}}
+        </script>
       </div>
 {{>bottom}}

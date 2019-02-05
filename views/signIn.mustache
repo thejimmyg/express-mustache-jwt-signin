@@ -5,7 +5,7 @@
         {{#signInError}}
         <div class="alert alert-danger">{{signInError}}</div>
         {{/signInError}}
-        <form id="data-pjax" method="POST" action="{{action}}">
+        <form id="data-pjax" method="POST" action="{{action}}" enctype="application/x-www-form-urlencoded">
           <div class="form-group">
             <label for="username">Username:</label>
             <input class="form-control" id="username" type="text" placeholder="Username" name="username" value="{{username}}">
@@ -19,13 +19,6 @@
         {{>signInBottom}}
         <script type="application/javascript">
           {{^username}}$("#username").focus(){{/username}}
-          {{#withPjaxPwa}}
-          // Note an external 301 redirect will be performed by the server anyway if
-          // successful so there will be a full reload
-          $(document).on('submit', 'form[data-pjax]', function(event) {
-            $.pjax.submit(event, '#pjax-container')
-          })
-          {{/withPjaxPwa}}
         </script>
       </div>
 {{>bottom}}

@@ -36,7 +36,7 @@ if (!secret || secret.length < 8) {
 // Use the createCredentialsFromWatchedUsersYaml to specify users in a yaml file as we do here.
 
 const overlaysOptions = overlaysOptionsFromEnv()
-const { scriptName } = overlaysOptions
+const { withPjaxPwa, scriptName } = overlaysOptions
 const { mustacheDirs, publicFilesDirs } = overlaysDirsFromEnv()
 
 // const scriptName = process.env.SCRIPT_NAME || ''

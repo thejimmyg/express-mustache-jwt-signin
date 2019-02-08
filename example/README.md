@@ -3,8 +3,14 @@
 You can test the example as simply as:
 
 ```
+cd ../
+npm install
+cd example
+npm install
 npm start
 ```
+
+If you get a warning about not being able to install a package, remove your `package-lock.json` file and try again.
 
 For production use you'll want to change the settings in the code, or use environment variables.
 
@@ -19,8 +25,7 @@ DEBUG="bootstrap-flexbox-overlay,express-render-error,express-mustache-overlays,
 Docker can't copy files from a parent directory so the `docker:build` command puts the current dev version of express-mustache-jwt-signin in this directory and created a modified `package.json.docker`:
 
 ```
-npm run docker:build
-npm run docker:run
+npm run docker:build && npm run docker:run
 ```
 
 ## Dev

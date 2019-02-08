@@ -233,6 +233,10 @@ npm run fix
 
 ## Changelog
 
+### 0.5.1 2019-02-07
+
+* Publish the codebase, not the example.
+
 ### 0.5.0 2019-02-07
 
 * Big refactor and simplification

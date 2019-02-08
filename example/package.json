@@ -1,5 +1,5 @@
 {
-  "name": "express-mustache-jwt-signin",
+  "name": "express-mustache-jwt-signin-example",
   "version": "0.5.0",
   "description": "A set of mustache templates to be used with express-mustache-overlays that provides a Bootstrap and Flexbox theme.",
   "scripts": {

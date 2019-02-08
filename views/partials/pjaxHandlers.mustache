@@ -1,9 +1,0 @@
-$(document).ready(function() {
-  console.log('Installing pjax click handler...')
-  // Note an external 301 redirect will be performed by the server anyway if
-  // successful so there will be a full reload
-  $(document).on('submit', '#data-pjax', function(event) {
-    console.log('Sending with pjax ...')
-    $.pjax.submit(event, '#pjax-container', {"fragment": "#pjax-container", timeout: 4000, contentType: 'application/x-www-form-urlencoded', data: $(this).serialize()})
-  })
-})

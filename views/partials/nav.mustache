@@ -1,6 +1,3 @@
-            {{#user.admin}}
-            <a href="{{adminUrl}}">Admin</a> | <a href="{{hashUrl}}">Hash</a>
-            {{/user.admin}}
-            {{^user.admin}}
-            <a href="{{scriptName}}/">Home</a>
-            {{/user.admin}}
+          {{#user}}
+            <a href="{{#signIn}}{{dashboardUrl}}{{/signIn}}">Dashboard</a>
+          {{/user}}

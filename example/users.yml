@@ -1,0 +1,6 @@
+hello:
+  password: world
+  claims:
+    admin: true
+  # Extra information isn't stored in the JWT claims, but can be accessed via `await userManager.getUser(username)`
+  email: hello@example.com

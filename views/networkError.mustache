@@ -1,0 +1,9 @@
+{{>top}}
+      <div class="p-3 flex-grow-1">
+        <article>
+          <h1>Error: No connection to server</h1>
+          <p>No network connection. <a href="javascript:history.back()">&lt; Go back</a> or 
+          {{#withPjaxPwa}}<a href="javascript:$.pjax.reload('#pjax-container', {'timeout': 2000, 'fragment': '#pjax-container'})">{{/withPjaxPwa}}{{^withPjaxPwa}}<a href="javascript:window.location.href=window.location.href">{{/withPjaxPwa}}try again</a>.</p>
+        </article>
+      </div>
+{{>bottom}}

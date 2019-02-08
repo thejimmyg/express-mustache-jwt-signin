@@ -1,26 +1,23 @@
 {
   "name": "express-mustache-jwt-signin",
-  "version": "0.4.0",
-  "description": "A sign in example",
+  "version": "0.5.0",
+  "description": "A set of mustache templates to be used with express-mustache-overlays that provides a Bootstrap and Flexbox theme.",
   "scripts": {
-    "docker:build": "docker build . -t thejimmyg/express-mustache-jwt-signin:0.4.0",
-    "docker:push": "docker push thejimmyg/express-mustache-jwt-signin:0.4.0",
-    "docker:build:test": "docker build . -t thejimmyg/express-mustache-jwt-signin:test",
-    "docker:push:test": "docker push thejimmyg/express-mustache-jwt-signin:test",
-    "docker:run": "docker run -e USERS_YML='yaml/users.yml' -e SCRIPT_NAME='' -e HTTPS_ONLY=false -e DEBUG'=express-mustache-jwt-signin,express-mustache-overlays,express-mustache-jwt-signin:hash,express-mustache-jwt-signin:credentials' -e PORT=80 -e SECRET='reallysecret' --init -p 80:80 -v \"`pwd`/yaml:/app/yaml\" thejimmyg/express-mustache-jwt-signin:0.4.0",
-    "start": "node bin/server.js",
-    "fix": "standard --fix index.js bin/*.js lib/*.js"
+    "test": "node bin/test-hash.js",
+    "fix": "standard --fix",
+    "jwt-signin-hash": "node ./bin/hash.js"
+  },
+  "bin": {
+    "jwt-signin-hash": "./bin/hash.js"
   },
   "author": "JimmyG",
   "license": "MIT",
   "dependencies": {
     "chokidar": "^2.0.4",
-    "cookie-parser": "^1.4.3",
     "credential": "^2.0.0",
     "debug": "^4.1.0",
-    "express": "^4.16.4",
-    "express-mustache-overlays": "^0.4.2",
-    "js-yaml": "^3.12.0",
+    "getpass": "^0.1.7",
+    "js-yaml": "^3.12.1",
     "jsonwebtoken": "^8.4.0",
     "lodash": "^4.17.11"
   },

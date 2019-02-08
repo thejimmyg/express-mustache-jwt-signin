@@ -1,10 +1,8 @@
+{{>beforeUserStatus}}
           {{#user}}
-            {{#user.admin}}
-            Admin
-            {{/user.admin}}
-            <strong>{{username}}</strong>
-            <a href="{{signOutUrl}}">Sign Out</a>
+            <strong>{{username}}</strong>{{#admin}} (Admin){{/admin}} <a href="{{#signIn}}{{signOutUrl}}{{/signIn}}">Sign out</a>
           {{/user}}
           {{^user}}
-            <a href="{{signInUrl}}">Sign In</a>
+            <a href="{{#auth}}{{signInUrl}}{{/auth}}">Sign in</a>
           {{/user}}
+{{>afterUserStatus}}

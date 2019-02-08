@@ -1,11 +1,82 @@
-# Express Mustache JWT Sign In
+# Express Mustache JWT Signin
 
-**CAUTION: Under active development, not suitable for production use for people
-outside the development team yet.**
+Middleware components and express handlers for handling user authentication and authorization in express.
 
 **CAUTION: Plain text only passwords are still possible.**
 
 **CAUTION: If you use the `express-mustache-jwt-signin:hash` logger (enabled by default), submitted passwords will be logged.**
+
+**NOTE: Make sure you set `COOKIE_SECURE` to `false` if you want your cookies to work over HTTP for testing. Otherwise it will look like the cookie is being set, but the browser will ignore it so you won't be signed in. For production use you should only set secure cookies to be served over HTTPS with `COOKIE_SECURE=true` which is the default.**
+
+**NOTE: Usernames are case insensitive (they are treated as lowercase internally) whereas passwords are case-sensitive.**
+
+## Config
+
+This components in this package use the `app.locals.auth` and `app.locals.signIn` namespaces. They also sets `res.locals.user` on each request.
+
+
+## How it works
+
+When the user signs in, the username and any claims are encoded into a JSON Web
+Token (JWT) and saved in the cookie. The `withUser()` middleware will then parse the
+cookie on any subsequent requests, deocde the JWT and set the value as `res.locals.user`. If this object is present, the user is considered signed in.
+
+For example if your username is `hello` and your claims are `{"admin": true}` then the `res.locals.user` object for the response will be set to `{username: "hello", admin: true}`. (This is the example you'll see later in the `users.yml` file).
+
+You can then test if the user is signed-in in a mustache template, as well as
+access the username and any claims. Here's an example of all these things in
+action in the `./views/partials/userStatus.mustache` template:
+
+```
+          {{#user}}
+            <strong>{{username}}</strong>{{#admin}} (Admin){{/admin}} <a href="{{#signIn}}{{signOutUrl}}{{/signIn}}">Sign out</a>
+          {{/user}}
+          {{^user}}
+            <a href="{{#auth}}{{signInUrl}}{{/auth}}">Sign in</a>
+          {{/user}}
+```
+
+
+## Example
+
+For a full example, see the `./example` directory and `README.md`.
+
+The components also require the following middleware to be installed:
+
+```
+app.use(cookieParser())
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+```
+
+Important things to point out from the example:
+
+* The call to `prepareAuthAndSignIn()` prepares the `app.locals.auth` and `app.locals.signIn` namespacecs.
+* The `withUser()` middleware parses the JSON Web Token from the cookie or `Authorization` header and sets `res.locals.user` with the user data.
+* The `userManagerFromYml('users.yml')` code prepares a user manager that has a `validPassword()` method that is used to check the user password and return the user information if the password is valid.
+* The `setupSignIn()` call installs the handlers that handle sign in and sign out views and logic.
+* Other calls prepare and set up template overlays and public file serving.
+
+
+## Environment Variables
+
+All the environment variables from bootstrap-flexbox-overlay, express-render-error, express-mustache-overlays and express-public-files-overlays are available in the example, but the following are also available from `signInOptionsFromEnv()`:
+
+Used in `setupAuth()`:
+
+* `SECRET` - The secret using for signing the JWT
+* `SIGN_IN_URL` - The URL path that the sign in page appears at
+* `COOKIE_SECURE` - Defaults to `true` which means that your cookies won't be set over HTTP by default. Set this to `false` when debugging locally to make sure that your cookies are set for testing.
+* `COOKIE_NAME` - The name of the auth cookie, default `'jwt'`
+
+**NOTE: Make sure you set `COOKIE_SECURE` to `false` if you want your cookies to work over HTTP for testing.**
+
+`setupSignIn()` uses the options from `setupAuth()` as well as these additional options:
+
+* `DASHBOARD_URL` - URL that the sign in should redirect to when successful. Can be a full URL or a path. e.g `/dashboard'
+* `SIGN_OUT_URL` - The URL the user should visit to sign out
+* `USERS_YML` - The path of the users YAML file. Defaults to `'users.yml'`.
+
 
 ## Password format in `yaml/users.yml`
 
@@ -25,178 +96,49 @@ hello:
     admin: true
 ```
 
-## Example
-
-```
-npm install
-DEBUG=express-mustache-jwt-signin:hash node lib/hash.js
-USERS_YML=yaml/users.yml MUSTACHE_DIRS="views-overlay" PUBLIC_FILES_DIRS="public-overlay" SCRIPT_NAME="" HTTPS_ONLY=false PORT=8000 SECRET='reallysecret' DEBUG=express-mustache-jwt-signin,express-mustache-jwt-signin:credentials,express-mustache-jwt-signin:hash,express-mustache-overlays npm start
-```
-
-You can also set these defaults:
-
-* `SIGN_IN_URL` - The URL path that the sign in page appears at
-* `SIGN_OUT_URL` - The URL the user should visit to sign out
-* `COOKIE_NAME` - The name of the auth cookie, default `'jwt'`
-* `FORBIDDEN_TEMPLATE` - The template to use when the user doesn't have the correct permissions. Default `'403'`
-* `FORBIDDEN_TITLE`- The title of the forbidden page template
-
-**NOTE: Make sure you set `HTTPS_ONLY` to `false` if you want your cookies to work over HTTP for testing.**
-
-As well as:
-
-* `DASHBOARD_URL` - URL that the sign in should redirect to when successful. Can be a full URL or a path. e.g `/dashboard'
-* `HASH_URL` - URL path to the password hash generator screen in the example
-* `ADMIN_URL` - URL path to the admin information screen in the example
-* `HTTPS_ONLY` - Defaults to `true` which means that your cookies won't be set over HTTP by default. Set this to `false` when debugging locally to make sure that your cookies are set for testing.
-* `SIGN_IN_TITLE` - Title for the sign in page
-* `SIGNED_OUT_TITLE` - Title for the signed out page
-
-You can use all the express-mustache-overlays options including `WITH_PJAX_PWA=true`.
-
 Visit http://localhost:8000 and sign in with username `hello` and password `world`.
-
-User information in this example is loaded from `yaml/users.yml` via the
-`express-mustache-jwt-signin/lib/loadUsers` module.
-
-Notice that `Admin` appears in the top right if the `admin` claim is set to
-`true` in the `yaml/users.yml` file when you sign in.
 
 You should be able to make requests to routes restricted with `signedIn`
 middleware as long as you have the cookie, or use the JWT in an `Authorization
 header like this:
 
 ```
+Authorization: <JWT goes here>
+```
+
+Or like this:
+
+```
 Authorization: Bearer <JWT goes here>
 ```
 
-You can access user data by keeping the a reference to the varibale returned by `createCredentialsFromWatchedUsersYaml()`. Its `.users` attribute will be updated as the file changes:
+You can access user data by keeping the a reference to the variable returned by `userManagerFromYml('users.yml')`. Its data will reload if you change the file:
 
 ```
-const userData = await createCredentialsFromWatchedUsersYaml(process.env.USERS_YML)
-console.log(userData.users)
+const { userManagerFromYml } = require('express-mustache-jwt-signin')
+const userManager = userManagerFromYml('users.yml')
+userManager.getUser('hello')
+.then(console.log)
+.catch(console.error)
+// Because the userManager is running a watch for changes, need to exit explicitly.
+.then(() => process.exit(0))
 ```
 
-Then use `userData.credentials` as your credentials function. (There is also a `userData.passwords` which you should not use.)
+**Note: Usernames are treated as lower-case everywhere.**
 
-**Note: Usernames are treated as lower-case everywhere. So you should use a lower-case email when looking up data in `userData.users`**
 
-## Configuration
+## Testing using `setUser()`
 
-This module exports two functions, `setupLogin` and `setupMiddleware`. You can
-import them like this:
+The `setUser()` middleware allows you to set a user explicitly without using the `setupSignIn()` infrastrucutre. This is handy to add for debugging, or quickly becoming a user for testing some permissions.
 
 ```
-const { setupLogin, setupMiddleware } = require('express-mustache-jwt-signin')
+const { setUser } = require('express-mustache-jwt-signin')
+app.use(setUser({username: 'user', admin: true}))
 ```
 
-`setupMiddleware` is used when you want a different Express app to be able to
-use the credentials produced by this package. `setupLogin` is for setting up
-the middleware and a set of routes, templates and handlers that allows a user
-to sign in and out with a web interface. `setupLogin` calls `setupMiddelware`
-internally as part of its setup.
+The data structure is simply the claims object (if there are any claims), together with an extra key named `username` for the username.
 
-**`await setupMiddleware(secret, [options])`**
-
-Options:
-* `signInURL` - The URL path you want the sign in page to appear at, e.g. `'/signin'`
-* `signOutURL` - The URL path you want the sign out page to appear at, e.g. `'/signout'`
-* `overlays` - Add the default templates etc
-
-Returns:
-
-* `withUser` - Express middleware for adding `req.user` to the request based on the contents of the JWT
-* `signedIn` - Express middleware for ensuring `req.user` is present, and
-  redirecting to a sign in page if not for the user to sign in
-* `hasClaims` - Express middleware for checking the claims associated with a custom function
-
-Note, `withUser` requires the `cookie-parser` middleware set up first:
-
-```
-const cookieParser = require('cookie-parser')
-
-const app = express()
-app.use(cookieParser())
-```
-
-Requires:
-
-* `secret` - A secret string of at least 8 characters for signing and verifying JWTs
-
-Options:
-
-An object with the following optional keys:
-
-* `jwtCookieName` - The name to use for the cookie that will contain the JWT, e.g. `jwt`
-* `signInURL` - The URL path you want the sign in page to appear at, e.g. `'/signin'`
-* `signOutURL` - The URL path you want the sign out page to appear at, e.g. `'/signout'`
-* `signInTitle` - The title of the sign in page, e.g. 'Sign In'
-* `signedOutTitle` - The title of the signed out page, e.g. 'Signed Out'
-* `extractTokenFromRequest` - A function that is passed the request `req` and
-  the cookie name `jwtCookieName` and is expected to reurn the JWT as a string.
-  The default implementation will obtain a JWT from a cookie first, or the
-  `Authorization` header otherwise. If using the `Authorization` header, it
-  will accept the JWT itself as the value, or the JWT prefixed with `Bearer `.
-* `forbiddenTemplate` - the name of the template to render by `hasClaims` if the check fails
-* `forbiddenTitle` - the title to give the page rendered by `hasClaims` if the check fails
-
-**`await setupLogin(app, secret, credentials, [options])`**
-
-Sets up the `withUser` middleware to populate `req.user` as well as routes for
-signing a user in and out.
-
-Returns:
-
-The same `withUser`, `signedIn` and `hasClaims` middleware that `setupMiddleware` returns,
-as described above. Although `withUser` isn't really needed because it is
-already applied.
-
-`setupLogin()` sets up the `cookie-parser` middleware for you.
-
-Requires:
-
-* `app` - The Express app that should have the middleware and routes applied to it
-* `secret` - A secret string of at least 8 characters for signing and verifying JWTs
-* `credentials` - Either a credential checking function (see below) or an
-  object of credentials of the form `{username: {password, claims}}` where the
-  `claims` can be a set of JSON-serialisable key-value pairs to use as JWT
-  claims e.g. `{admin: true}`. The `claims` should not include `username` or
-  `iat` keys.
-
-If you choose to pass a function as the `credentials` argument, it should take
-the `username` and `password` submitted by the form and either return the
-claims to be added to the JWT (JSON-serialisable key value pairs excluding
-`'username'` and `'iat'` keys) or throw an Error.
-
-Here's a very simple example that only allows the username `hello` and password `world`:
-
-```
-async function credentials (username, password) {
-  if (username === 'hello' && password === 'world') {
-    return { 'admin': true }
-  }
-  throw new Error('Invalid credentials')
-}
-```
-
-Internally the function is called with `await` so if you define `credentials`
-as an async function you can use `async` and `await` in your definition.
-
-Options:
-
-* `signInURL` - same as in `setupMiddleware()` options described above
-* `jwtCookieName` - same as in `setupMiddleware()` options described above
-* `extractTokenFromRequest` - same as in `setupMiddleware()` options described above
-* `forbiddenTemplate` - same as in `setupMiddleware()` options described above
-* `forbiddenTitle` - same as in `setupMiddleware()` options described above
-* `httpsOnly` - defaults to `true` and means the cookie is not sent by the browser over unsecure HTTP. For local testing it is useful to set this to `false`.
-* `dashboardURL` - e.g. `'/dashboard'`
-* `signOutURL` - e.g. `'/signout'`
-* `signedOutTemplate` - e.g. `'signedOut'`
-* `signInTemplate` - e.g. `'signIn'`
-* `signedOutTitle` - e.g. `'Signed Out'`
-* `signInTitle` - e.g. `'Sign In'`
-* `signedOutTitle` - e.g. `'Signed Out'`
+Make sure you set it after `setupAuth()` if you want the user to be overriden, otherwise the middleware from `setupAuth()` will overwrite `app.locals.user` afterwards.
 
 
 ## Development
@@ -205,73 +147,33 @@ Options:
 npm run fix
 ```
 
-A typical way of setting up this middleware in an app is as follows:
-
-```
-const express = require('express')
-const { makeStaticWithUser, setupMiddleware } = require('express-mustache-jwt-signin')
-
-const signInURL = process.env.SIGN_IN_URL || '/user/signin'
-const signOutURL = process.env.SIGN_OUT_URL || '/user/signout'
-const secret = process.env.SECRET
-const disableAuth = ((process.env.DISABLE_AUTH || 'false').toLowerCase() === 'true')
-if (!disableAuth) {
-  if (!secret || secret.length < 8) {
-    throw new Error('No SECRET environment variable set, or the SECRET is too short. Need 8 characters')
-  }
-  if (!signInURL) {
-    throw new Error('No SIGN_IN_URL environment variable set')
-  }
-} else {
-  debug('Disabled auth')
-}
-const disabledAuthUser = process.env.DISABLED_AUTH_USER
-
-
-const main = async () => {
-  app = express()
-  const authMiddleware = await setupMiddleware(app, secret, { overlays, signOutURL, signInURL })
-  const { signedIn, hasClaims } = authMiddleware
-  let { withUser } = authMiddleware
-  if (disableAuth) {
-    withUser = makeStaticWithUser(JSON.parse(disabledAuthUser || 'null'))
-  }
-  app.use(withUser)
-  ...
-}
-```
-
-With this setup you can set `DISABLE_AUTH` to true to put the auth system into development mode allowing cookies to be set over HTTP (and not just HTTPS) and forcing the currently signed-in user to be set from the `DISABLED_AUTH_USER` environment variable rather than via the real sign in system.
-
-This means you can then start your app in development mode using something like this:
-
-```
-SECRET=reallysecret DISABLE_AUTH=true DISABLED_AUTH_USER='{"admin": true, "username": "disableduser"}' npm start
-```
-
-
-## Docker
-
-```
-npm run docker:build
-docker login <REGISTRY_URL>
-npm run docker:push
-npm run docker:run
-```
-
-**NOTE: When running from Docker, we don't use the development yaml/users.yml
-you are expected to mount your own `yaml` volumne containing your `users.yml`
-into `/app/yaml`.**
 
 ### Test
+
+
+You can test hashing with:
+
+```
+npm test
+```
+
+or:
+
+```
+node bin/test-hash.js
+```
+
+You'll see some test output and then the test should exit without an error.
+
+Start the example and then you can test with `curl` like this:
 
 Login:
 
 ```
 # Success
-curl -X POST -v --data "username=hello&password=world" http://localhost:8000/user/signin
+curl -X POST -v --data "username=hello&password=world" http://localhost:8000/signin
 # Failure
-curl -X POST -v --data "username=hello&password=INVALID" http://localhost:8000/user/signin
+curl -X POST -v --data "username=hello&password=INVALID" http://localhost:8000/signin
 ```
 
 Accessing via cookie or Authorization header:
@@ -281,11 +183,11 @@ Accessing via cookie or Authorization header:
 export VALID_JWT="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoiaGVsbG8iLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNTQzNTg4MjE3fQ.Uj5-C3seMxxrg_H7NaDYoh4LgKE_Br4jIAPzSt8Jyic"
 export INVALID_JWT="${VALID_JWT}_invalid"
 # Valid
-curl -H "Authorization: Bearer $VALID_JWT" http://localhost:8000/user/dashboard
-curl --cookie "jwt=$VALID_JWT;" http://localhost:8000/user/dashboard
+curl -H "Authorization: Bearer $VALID_JWT" http://localhost:8000/dashboard
+curl --cookie "jwt=$VALID_JWT;" http://localhost:8000/dashboard
 # Invalid
-curl -H "Authorization: Bearer $INVALID_JWT" http://localhost:8000/user/dashboard
-curl --cookie "jwt=$INVALID_JWT;" http://localhost:8000/user/dashboard
+curl -H "Authorization: Bearer $INVALID_JWT" http://localhost:8000/dashboard
+curl --cookie "jwt=$INVALID_JWT;" http://localhost:8000/dashboard
 ```
 
 At the moment only JWTs with HS256 will be allowed. You can verify this with a
@@ -293,126 +195,58 @@ token that uses a different algorithm like this one which uses `HS512`:
 
 ```
 export ALG_JWT="eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoiaGVsbG8iLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNTQzNTg4MjE3fQ.eym-MugNjwzmD114trr6Mss5KpenDB42MONCDqmaBJyDBisQHCehqoMyPqC80uFtIkwo3uP8N_5Vn9lbYPLB6g"
-curl --cookie "jwt=$ALG_JWT;" http://localhost:8000/user/dashboard
+curl --cookie "jwt=$ALG_JWT;" http://localhost:8000/dashboard
 ```
 
 You'll see:
 
 ```
-Found. Redirecting to /user/signin
+Found. Redirecting to /signin
+```
+
+## Response Variables
+
+You can set `metaDescription` in the data of each call to `res.render()` to set the description meta tag.
+
+
+## Scripts
+
+You can generate a new password hash from the command line like this:
+
+```
+npm run jwt-signin-hash
+```
+
+Or, if the pacakge is installed globally, directly like this:
+
+```
+jwt-signin-hash
+```
+
+
+## Dev
+
+```
+npm run fix
 ```
 
 
 ## Changelog
 
+### 0.5.0 2019-02-07
 
-### 0.4.0 2019-01-19
+* Big refactor and simplification
+* Split out the auth side of things from the sign in and sign out side of things
+* Can use auth middleware directly, without complex setup
+* Only one way of providing credentials now, via a user manager `validPassword()` method.
+* Set up redirect as a template so it can be overridden
+* Changed `HTTPS_ONLY` to `COOKIE_SECURE` to be clearer
+* Removed `DISABLE_AUTH` and `DISABLED_AUTH_USER` and instead provided `setUser()` middleware which you can use yourself
+* Removed `FORBIDDEN_TITLE` and `FORBIDDEN_TEMPLATE` since you can always overlay a new 403 for customisation
+* Also removed `SIGNED_OUT_TEMPLATE`, `SIGNED_OUT_TITLE`, `SIGN_IN_TITLE` and `SIGN_IN_TEMPLATE` for the same reason
+* Removed the admin page (instead the `views/userStatus.mustache` template demonstrates the use of a claim (`admin`)
+* Removed the generate a hash page - instead use the command line tool to generate hashed passwords
+* Upgraded express-mustache-overlays, express-public-files-overlays, express-render-error etc
+* Moved Changelog to separate `CHANGELOG.md`
 
-* Upgraded to express-mustache-overlays 0.4.2
-* Renamed all `*URL` variables that aren't environment variables to `*Url` e.g. `signInURL` -> `signInUrl` **Caution: This means your templates that use these variables will need to be updated.**
-* Added `signInOptionsFromEnv()` function
-
-### 0.3.3 2019-01-02
-
-* Handle SIGTERM
-* Included an example of using the middleware in another app.
-
-### 0.3.2 2018-12-24
-
-* Support `DASHBOARD_URL`
-* Add `makeStaticWithUser()` function
-
-### 0.3.1 2018-12-21
-
-* Default port for `Dockerfile` is now 80
-* Fixed a bug with `MUSTACHE_DIRS` and `PUBLIC_FILES_DIRS` not working correctly from the example
-
-### 0.3.0 2018-12-21
-
-* Refactor for `express-mustache-overlays` 0.3.0, and updated example
-* Change the API to require an `overlays` argument in `setupLogin` and have it as an optional requirement in `setupMiddleware`
-* `setupMiddleware` is now async and so requires awaiting
-* No environment variables needed in `lib`
-* More variables configurable from the environment
-
-### 0.2.12 2018-12-20
-
-* Include `Sign Out` link and `Admin` claim in `userStatus.partial`
-
-### 0.2.11 2018-12-20
-
-* Set `res.locals.user` in the `withUser` middleware
-* Pass config directly to the middleware
-* Fix error message from `rest` not correctly specifying key names
-
-### 0.2.10 2018-12-20
-
-* Upgrade to `express-mustache-overlays` version 0.2.2
-
-### 0.2.9 2018-12-20
-
-* Upgrade to `express-mustache-overlays` version 0.2.1
-
-### 0.2.8 2018-12-20
-
-* Added try, catch blocks around the async handlers
-* Logging the cookie options
-* Responding to the `HTTPS_ONLY` environment variable in the `lib/index.js`, rather than `bin/server.js` so that it takes effect in extrenal projects using `setupLogin()` too.
-
-### 0.2.7 2018-12-19
-
-* Adding a 500 handler
-* Moving nav links to the left hand side and inclusing `Hash`
-* Upaded docker config for `npm run docker:run`
-* Generated hashes now appear as a success message on the hash page, not a plain text response
-
-### 0.2.6 2018-12-19
-
-* Added a password hashing page at `/hash` for users with the `admin: true` claim
-* Added `express-mustache-jwt-signin:hash` logger and for the `lib/loadUsers.js` module to treat passwords >= 64 characters in length as base64-encoded password hashes to be decoded and verified with `credential`
-
-### 0.2.5 2018-12-17
-
-* Make `DASHBOARD_URL` configurable.
-* Added missing `js-yaml` dependency.
-* Changed `top.mustache` flexbox height
-
-### 0.2.4 2018-12-15
-
-* Made mustacheDirs an array for correct reloading, and allow preferred overlays to be specified as `MUSTACHE_DIRS=viewsDir1:viewsDir2:viewsDir3` etc. The defaults in `views` will still be used last if a particular template or partial can't be found in the specified directories.
-* Added a 403 page instead of a redirect to sign in when a page is forbidden
-* Big refactor of the code to make Let's Encrypt fetching disabled by default, and enabled with the `--lets-encrypt` flag
-* Swapped `commander` npm package for `dashdash`
-* Home page removed from example, redirects to `dashboardURL` directly, and `dashboardURL` part of the `templateDefaults`
-* Changed the `users.yml` file reloading to be throttled, and also reload on delete and overwrite, having empty user data if there is no file.
-* Ability to specify the `users.yml` file path with `USERS_YML`
-
-### 0.2.3 2018-12-13
-
-* Created `httpsOnly` option for secure cookies. It defaults to `true` and is used as the `secure` parameter to `res.cookie`. The value no longer depends on the value of `NODE_ENV`.
-* Support `SCRIPT_NAME` environment variable which defaults to `/` but is passed into the templates as `scriptName` in case paths need to be relative to this URL.
-* Created a system for loading user data and claims from `users.yml` data and use it in the example. Have the data automatically reload when the file is changed (although this doesn't take effect until the user signs in and out again).
-
-### 0.2.2
-
-* Modified naming convention for templates and variables
-* Documented the options
-* Updated the templates to use FlexBox
-
-### 0.2.1
-
-* `credentials` can now be a function which checks a username and password and returns claims, or a data structure like this: `{'hello': {password: 'world', claims: {"admin": true}}}`
-* Use `/user/signin`, `/user/dashboard` and `/user/signout` as the URLs so that the whole app can be proxied too to handle auth
-* Use the actual URLs in the templates
-* Added a `setupMiddleware` function so that you can use the `signedIn` and `withUser` middleware without setting up routes on an express app at the same time
-* Explicit use of HS256 algorithm
-
-### 0.2.0
-
-* `signedIn` requires `withUser` first (which it should have if you use `app.use(withUser)`).
-* Removed passport, signed cookies
-* Return middeleware configured for custom URLs
-
-### 0.1.0
-
-* Initial release
+Please look in `CHANGELOG.md` in future as this entry will move too.

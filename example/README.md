@@ -1,4 +1,4 @@
-# Example
+# Express Mustache JWT Signin Example
 
 You can test the example as simply as:
 
@@ -7,7 +7,7 @@ cd ../
 npm install
 cd example
 npm install
-npm start
+PORT=8000 npm start
 ```
 
 If you get a warning about not being able to install a package, remove your `package-lock.json` file and try again.
@@ -17,8 +17,15 @@ For production use you'll want to change the settings in the code, or use enviro
 To see all the debug output you should run:
 
 ```
-DEBUG="bootstrap-flexbox-overlay,express-render-error,express-mustache-overlays,express-public-files-overlays,express-mustache-jwt-signin,express-mustache-jwt-signin:server" npm start
+DEBUG="bootstrap-flexbox-overlay,express-render-error,express-mustache-overlays,express-public-files-overlays,express-mustache-jwt-signin,express-mustache-jwt-signin:server" PORT=8000 npm start
 ```
+
+Or to log everything, use:
+
+```
+DEBUG="*" PORT=8000 npm start
+```
+
 
 ## Docker
 

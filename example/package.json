@@ -3,26 +3,26 @@
   "version": "0.5.0",
   "description": "A set of mustache templates to be used with express-mustache-overlays that provides a Bootstrap and Flexbox theme.",
   "scripts": {
-    "docker:build": "echo 'Docker cannnot copy files from a parent directory so we need to put the current dev version of express-mustache-jwt-signin in this directory and change package.json'; mkdir -p express-mustache-jwt-signin ; rsync --delete --exclude='example' --exclude='.git' --exclude='node_modules' -aHxv ../ express-mustache-jwt-signin/ ; cat package.json | sed -e 's|file:..|file:express-mustache-jwt-signin|g' > package.json.docker ; docker build . -t thejimmyg/express-mustache-jwt-signin:0.5.0",
+    "docker:build": "echo 'Docker cannnot copy files from a parent directory so we need to put the current dev version of express-mustache-jwt-signin in this directory and change package.json'; mkdir -p express-mustache-jwt-signin ; rsync --delete --exclude='*.DS_Store' --exclude='example' --exclude='.git' --exclude='node_modules' -aHxv ../ express-mustache-jwt-signin/ ; cat package.json | sed -e 's|file:..|file:express-mustache-jwt-signin|g' > package.json.docker ; docker build . -t thejimmyg/express-mustache-jwt-signin:0.5.0",
     "docker:push": "docker push thejimmyg/express-mustache-jwt-signin:0.5.0",
     "docker:tag:test": "docker image tag thejimmyg/express-mustache-jwt-signin:0.5.0 thejimmyg/express-mustache-jwt-signin:test",
     "docker:push:test": "docker push thejimmyg/express-mustache-jwt-signin:test",
     "docker:run": "docker run -e SCRIPT_NAME='' -e DEBUG'=express-mustache-jwt-signin:server,express-mustache-jwt-signin' -e PORT=80 --init -p 80:80 thejimmyg/express-mustache-jwt-signin:0.5.0",
     "fix": "standard --fix",
-    "start": "PORT=8000 node server.js"
+    "start": "node server.js"
   },
   "author": "JimmyG",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "bootstrap-flexbox-overlay": "0.1.1",
+    "bootstrap-flexbox-overlay": "0.1.2",
     "cookie-parser": "^1.4.3",
     "debug": "^4.1.0",
     "express": "^4.16.4",
     "express-mustache-jwt-signin": "file:..",
-    "express-mustache-overlays": "0.5.1",
-    "express-public-files-overlays": "0.1.1",
-    "express-render-error": "0.1.1"
+    "express-mustache-overlays": "0.5.2",
+    "express-public-files-overlays": "0.1.2",
+    "express-render-error": "0.1.2"
   },
   "devDependencies": {
     "standard": "^12.0.1"

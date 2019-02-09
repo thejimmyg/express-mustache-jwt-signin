@@ -233,7 +233,11 @@ npm run fix
 
 ## Changelog
 
-### 0.5.1 2019-02-07
+### 0.5.2 2019-02-08
+
+* Improved the Docker example
+
+### 0.5.1 2019-02-08
 
 * Publish the codebase, not the example.
 

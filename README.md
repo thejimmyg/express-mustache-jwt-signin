@@ -233,6 +233,10 @@ npm run fix
 
 ## Changelog
 
+### 0.5.3 2019-02-09
+
+* Removed accidentally added JS files. They are released under the licenses described here: https://github.com/thejimmyg/bootstrap-flexbox-overlay/blob/5b85a49741c1521c77fff1bff0b56947fa804854/LICENSE.md and https://github.com/defunkt/jquery-pjax/blob/master/LICENSE
+
 ### 0.5.2 2019-02-08
 
 * Improved the Docker example

@@ -25,22 +25,10 @@ prepareTheme(app, bootstrapOptionsFromEnv(app))
 
 const envSignInOptions = signInOptionsFromEnv(app)
 const envAuthOptions = authOptionsFromEnv(app)
-if ((typeof envAuthOptions.secret === 'undefined') || (envAuthOptions.cookieSecure !== true)) {
-  const msg = 'WARNING: Settings only for development. Need to set secret and cookieSecure for production.'
-  debug(msg)
-  console.error(msg)
-}
-const defaultAuthOptions = {
-  signInUrl: '/signin',
-  // Change this!
-  secret: 'reallysecret', // Needs to be long and kept secret for production
-  cookieSecure: false // Should be set to true to only allow browsers to accept cookies over HTTPS
-}
 // We don't want to keep secret in app.locals.auth so it gets returned to be used explicitly in withUser. (Avoids accidental rendering in a template for example)
-const { secret } = prepareAuth(app, Object.assign({}, defaultAuthOptions, envAuthOptions))
+const { secret } = prepareAuth(app, envAuthOptions)
 const defaultSignInOptions = {
-  dashboardUrl: '/dashboard',
-  signOutUrl: '/signout'
+  dashboardUrl: '/dashboard'
 }
 prepareSignIn(app, Object.assign({}, defaultSignInOptions, envSignInOptions))
 

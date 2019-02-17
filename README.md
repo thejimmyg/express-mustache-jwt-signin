@@ -233,9 +233,15 @@ npm run fix
 
 ## Changelog
 
+### 0.5.5 2019-02-17
+
+* Set some defaults: `dashboardUrl: '/dashboard'`
+* Add PJAX support, detected client-side
+* Deleted the `networkError.mustache` view which is provided by the pjax-pwa-overlay package.
+
 ### 0.5.4 2019-02-17
 
-* Set some defaults: `signOutUrl: '/signout', cookieName: 'jwt', cookieSecure: true, signInUrl: '/signin', usersYml: 'users.yml'`
+* Set some defaults: `signOutUrl: '/signout', dashboardUrl: '/dashboard', cookieName: 'jwt', cookieSecure: true, signInUrl: '/signin', usersYml: 'users.yml'`
 * Add connect-multiparty middleware to the example for PJAX support
 * Don't sign out when someone visits the sign in page
 

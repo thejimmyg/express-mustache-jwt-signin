@@ -9,6 +9,8 @@ const { setupSignIn, prepareSignIn, signInOptionsFromEnv } = require('express-mu
 const { userManagerFromYml } = require('express-mustache-jwt-signin')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
+const multipart = require('connect-multiparty')
+const multipartMiddleware = multipart()
 
 // Install signal handlers
 installSignalHandlers()
@@ -46,8 +48,9 @@ prepareSignIn(app, Object.assign({}, defaultSignInOptions, envSignInOptions))
 
 // Setup middleware
 app.use(cookieParser())
-app.use(bodyParser.json())
+// app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(multipartMiddleware)
 
 // Setup public files *before* the error handler
 setupPublicFiles(app)

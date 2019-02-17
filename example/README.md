@@ -17,15 +17,14 @@ For production use you'll want to change the settings in the code, or use enviro
 To see all the debug output you should run:
 
 ```
-DEBUG="bootstrap-flexbox-overlay,express-render-error,express-mustache-overlays,express-public-files-overlays,express-mustache-jwt-signin,express-mustache-jwt-signin:server" PORT=8000 npm start
-```
-
-Or to log everything, use:
-
-```
 DEBUG="*" PORT=8000 npm start
 ```
 
+You can choose just a few selected loggers by comma-separating their names like this:
+
+```
+DEBUG="bootstrap-flexbox-overlay,express-render-error,express-mustache-overlays,express-public-files-overlays,express-mustache-jwt-signin,express-mustache-jwt-signin:server" PORT=8000 npm start
+```
 
 ## Docker
 

@@ -16,11 +16,11 @@
           </div>
           <button class="btn btn-primary" type="submit">Sign In</button>
         </form>
-        {{>signInBottom}}
         {{^signInError}}
         <script type="application/javascript">
           {{^username}}$("#username").focus(){{/username}}
         </script>
         {{/signInError}}
+        {{>signInBottom}}
       </div>
 {{>bottom}}

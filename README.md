@@ -214,13 +214,13 @@ You can set `metaDescription` in the data of each call to `res.render()` to set 
 You can generate a new password hash from the command line like this:
 
 ```
-npm run jwt-signin-hash
+SECRET=reallysecret DEBUG=express-mustache-jwt-signin:hash npm run jwt-signin-hash
 ```
 
 Or, if the pacakge is installed globally, directly like this:
 
 ```
-jwt-signin-hash
+SECRET=reallysecret DEBUG=express-mustache-jwt-signin:hash jwt-signin-hash
 ```
 
 
@@ -232,6 +232,11 @@ npm run fix
 
 
 ## Changelog
+
+### 0.5.6 2019-03-21
+
+* Documented the use of `SECRET` when using `bin/hash.js`
+* Fixed a bug in `bin/hash.js` where the password used was always `'password'` not the input
 
 ### 0.5.5 2019-02-17
 

@@ -233,6 +233,11 @@ npm run fix
 
 ## Changelog
 
+### 0.5.7 2019-03-23
+
+* Added in hash generation form again. Visit /hash in the example.
+* Ran `npm audit fix`
+
 ### 0.5.6 2019-03-21
 
 * Documented the use of `SECRET` when using `bin/hash.js`

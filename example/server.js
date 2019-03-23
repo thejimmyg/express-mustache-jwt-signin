@@ -4,13 +4,14 @@ const debug = require('debug')('express-mustache-jwt-signin:server')
 const { prepareMustache, setupMustache, mustacheFromEnv } = require('express-mustache-overlays')
 const { preparePublicFiles, setupPublicFiles, publicFilesFromEnv } = require('express-public-files-overlays')
 const { prepareTheme, bootstrapOptionsFromEnv } = require('bootstrap-flexbox-overlay')
-const { signedIn, prepareAuth, withUser, authOptionsFromEnv } = require('express-mustache-jwt-signin')
+const { signedIn, prepareAuth, hasClaims, withUser, authOptionsFromEnv } = require('express-mustache-jwt-signin')
 const { setupSignIn, prepareSignIn, signInOptionsFromEnv } = require('express-mustache-jwt-signin')
 const { userManagerFromYml } = require('express-mustache-jwt-signin')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const multipart = require('connect-multiparty')
 const multipartMiddleware = multipart()
+const { hashHandler } = require('express-mustache-jwt-signin/lib/hash-handler')
 
 // Install signal handlers
 installSignalHandlers()
@@ -55,6 +56,7 @@ app.get('/', signedIn, (req, res) => {
 app.get(app.locals.signIn.dashboardUrl, signedIn, (req, res) => {
   res.render('content', { content: '<h1>Dashboard</h1><p>Hello!</p>', title: 'Dashboard' })
 })
+app.all(app.locals.option.scriptName + '/hash', hasClaims(claims => claims.admin), hashHandler)
 setupSignIn(app, secret, userManagerFromYml(app.locals.signIn.usersYml))
 
 // Handle errors right at the end

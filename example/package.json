@@ -1,13 +1,13 @@
 {
   "name": "express-mustache-jwt-signin-example",
-  "version": "0.5.0",
+  "version": "0.5.7",
   "description": "A set of mustache templates to be used with express-mustache-overlays that provides a Bootstrap and Flexbox theme.",
   "scripts": {
-    "docker:build": "echo 'Docker cannnot copy files from a parent directory so we need to put the current dev version of express-mustache-jwt-signin in this directory and change package.json'; mkdir -p express-mustache-jwt-signin ; rsync --delete --exclude='*.DS_Store' --exclude='example' --exclude='.git' --exclude='node_modules' -aHxv ../ express-mustache-jwt-signin/ ; cat package.json | sed -e 's|file:..|file:express-mustache-jwt-signin|g' > package.json.docker ; docker build . -t thejimmyg/express-mustache-jwt-signin:0.5.0",
-    "docker:push": "docker push thejimmyg/express-mustache-jwt-signin:0.5.0",
-    "docker:tag:test": "docker image tag thejimmyg/express-mustache-jwt-signin:0.5.0 thejimmyg/express-mustache-jwt-signin:test",
+    "docker:build": "echo 'Docker cannnot copy files from a parent directory so we need to put the current dev version of express-mustache-jwt-signin in this directory and change package.json'; mkdir -p express-mustache-jwt-signin ; rsync --delete --exclude='*.DS_Store' --exclude='example' --exclude='.git' --exclude='node_modules' -aHxv ../ express-mustache-jwt-signin/ ; cat package.json | sed -e 's|file:..|file:express-mustache-jwt-signin|g' > package.json.docker ; docker build . -t thejimmyg/express-mustache-jwt-signin:0.5.7",
+    "docker:push": "docker push thejimmyg/express-mustache-jwt-signin:0.5.7",
+    "docker:tag:test": "docker image tag thejimmyg/express-mustache-jwt-signin:0.5.7 thejimmyg/express-mustache-jwt-signin:test",
     "docker:push:test": "docker push thejimmyg/express-mustache-jwt-signin:test",
-    "docker:run": "docker run -e SCRIPT_NAME='' -e DEBUG'=express-mustache-jwt-signin:server,express-mustache-jwt-signin' -e PORT=80 --init -p 80:80 thejimmyg/express-mustache-jwt-signin:0.5.0",
+    "docker:run": "docker run -e SCRIPT_NAME='' -e DEBUG'=express-mustache-jwt-signin:server,express-mustache-jwt-signin' -e PORT=80 --init -p 80:80 thejimmyg/express-mustache-jwt-signin:0.5.7",
     "fix": "standard --fix",
     "start": "node server.js"
   },

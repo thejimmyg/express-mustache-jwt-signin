@@ -1,6 +1,6 @@
 {
   "name": "express-mustache-jwt-signin",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "description": "A set of mustache templates to be used with express-mustache-overlays that provides a Bootstrap and Flexbox theme.",
   "scripts": {
     "test": "node bin/test-hash.js",
@@ -17,7 +17,7 @@
     "credential": "^2.0.0",
     "debug": "^4.1.0",
     "getpass": "^0.1.7",
-    "js-yaml": "^3.12.1",
+    "js-yaml": "^3.13.0",
     "jsonwebtoken": "^8.4.0",
     "lodash": "^4.17.11"
   },

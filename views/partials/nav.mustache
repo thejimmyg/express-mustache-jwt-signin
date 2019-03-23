@@ -1,3 +1,6 @@
           {{#user}}
             <a href="{{#signIn}}{{dashboardUrl}}{{/signIn}}">Dashboard</a>
+            {{#admin}}
+            | <a href="{{#option}}{{scriptName}}{{/option}}/hash">Hash</a>
+            {{/admin}}
           {{/user}}
